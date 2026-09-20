@@ -6,15 +6,9 @@
 // - Show declarations: true
 
 // Library unique name: <io.github.itisnomatter:kojev>
-final class <#A: kotlin/Any> io.github.itisnomatter.kojev/ChoiceQuestion { // io.github.itisnomatter.kojev/ChoiceQuestion|null[0]
-    constructor <init>(kotlin/String, kotlin.collections/Map<#A, kotlin/String?>, kotlin/Function1<#A, kotlin/String>) // io.github.itisnomatter.kojev/ChoiceQuestion.<init>|<init>(kotlin.String;kotlin.collections.Map<1:0,kotlin.String?>;kotlin.Function1<1:0,kotlin.String>){}[0]
-
-    final val criteria // io.github.itisnomatter.kojev/ChoiceQuestion.criteria|{}criteria[0]
-        final fun <get-criteria>(): kotlin.collections/Map<#A, kotlin/String?> // io.github.itisnomatter.kojev/ChoiceQuestion.criteria.<get-criteria>|<get-criteria>(){}[0]
-    final val instructions // io.github.itisnomatter.kojev/ChoiceQuestion.instructions|{}instructions[0]
-        final fun <get-instructions>(): kotlin/String // io.github.itisnomatter.kojev/ChoiceQuestion.instructions.<get-instructions>|<get-instructions>(){}[0]
-    final val label // io.github.itisnomatter.kojev/ChoiceQuestion.label|{}label[0]
-        final fun <get-label>(): kotlin/Function1<#A, kotlin/String> // io.github.itisnomatter.kojev/ChoiceQuestion.label.<get-label>|<get-label>(){}[0]
+abstract interface io.github.itisnomatter.kojev/Criterion { // io.github.itisnomatter.kojev/Criterion|null[0]
+    abstract val description // io.github.itisnomatter.kojev/Criterion.description|{}description[0]
+        abstract fun <get-description>(): kotlin/String // io.github.itisnomatter.kojev/Criterion.description.<get-description>|<get-description>(){}[0]
 }
 
 final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ChoiceAnswer { // io.github.itisnomatter.kojev/ChoiceAnswer|null[0]
@@ -26,6 +20,17 @@ final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ChoiceAnswer { // io.
         final fun <get-value>(): #A // io.github.itisnomatter.kojev/ChoiceAnswer.value.<get-value>|<get-value>(){}[0]
 }
 
+final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ScoreAnswer { // io.github.itisnomatter.kojev/ScoreAnswer|null[0]
+    final val confidence // io.github.itisnomatter.kojev/ScoreAnswer.confidence|{}confidence[0]
+        final fun <get-confidence>(): kotlin/Double // io.github.itisnomatter.kojev/ScoreAnswer.confidence.<get-confidence>|<get-confidence>(){}[0]
+    final val mostLikely // io.github.itisnomatter.kojev/ScoreAnswer.mostLikely|{}mostLikely[0]
+        final fun <get-mostLikely>(): #A // io.github.itisnomatter.kojev/ScoreAnswer.mostLikely.<get-mostLikely>|<get-mostLikely>(){}[0]
+    final val probabilities // io.github.itisnomatter.kojev/ScoreAnswer.probabilities|{}probabilities[0]
+        final fun <get-probabilities>(): kotlin.collections/Map<#A, kotlin/Double> // io.github.itisnomatter.kojev/ScoreAnswer.probabilities.<get-probabilities>|<get-probabilities>(){}[0]
+    final val score // io.github.itisnomatter.kojev/ScoreAnswer.score|{}score[0]
+        final fun <get-score>(): kotlin/Double // io.github.itisnomatter.kojev/ScoreAnswer.score.<get-score>|<get-score>(){}[0]
+}
+
 final class io.github.itisnomatter.kojev/Decision { // io.github.itisnomatter.kojev/Decision|null[0]
     final val model // io.github.itisnomatter.kojev/Decision.model|{}model[0]
         final fun <get-model>(): kotlin/String // io.github.itisnomatter.kojev/Decision.model.<get-model>|<get-model>(){}[0]
@@ -33,47 +38,16 @@ final class io.github.itisnomatter.kojev/Decision { // io.github.itisnomatter.ko
     final fun <#A1: kotlin/Any?> get(io.github.itisnomatter.kojev/QuestionKey<#A1>): #A1 // io.github.itisnomatter.kojev/Decision.get|get(io.github.itisnomatter.kojev.QuestionKey<0:0>){0§<kotlin.Any?>}[0]
 }
 
-final class io.github.itisnomatter.kojev/MalformedScoreAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MalformedScoreAnswerException|null[0]
-    final val key // io.github.itisnomatter.kojev/MalformedScoreAnswerException.key|{}key[0]
-        final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/MalformedScoreAnswerException.key.<get-key>|<get-key>(){}[0]
-    final val level // io.github.itisnomatter.kojev/MalformedScoreAnswerException.level|{}level[0]
-        final fun <get-level>(): kotlin/Int // io.github.itisnomatter.kojev/MalformedScoreAnswerException.level.<get-level>|<get-level>(){}[0]
+final class io.github.itisnomatter.kojev/MalformedAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MalformedAnswerException|null[0]
+    final val detail // io.github.itisnomatter.kojev/MalformedAnswerException.detail|{}detail[0]
+        final fun <get-detail>(): kotlin/String // io.github.itisnomatter.kojev/MalformedAnswerException.detail.<get-detail>|<get-detail>(){}[0]
+    final val key // io.github.itisnomatter.kojev/MalformedAnswerException.key|{}key[0]
+        final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/MalformedAnswerException.key.<get-key>|<get-key>(){}[0]
 }
 
 final class io.github.itisnomatter.kojev/MissingAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MissingAnswerException|null[0]
     final val key // io.github.itisnomatter.kojev/MissingAnswerException.key|{}key[0]
         final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/MissingAnswerException.key.<get-key>|<get-key>(){}[0]
-}
-
-final class io.github.itisnomatter.kojev/NoulQuestion { // io.github.itisnomatter.kojev/NoulQuestion|null[0]
-    constructor <init>(kotlin/String, kotlin/String? = ..., kotlin/String? = ...) // io.github.itisnomatter.kojev/NoulQuestion.<init>|<init>(kotlin.String;kotlin.String?;kotlin.String?){}[0]
-
-    final val instructions // io.github.itisnomatter.kojev/NoulQuestion.instructions|{}instructions[0]
-        final fun <get-instructions>(): kotlin/String // io.github.itisnomatter.kojev/NoulQuestion.instructions.<get-instructions>|<get-instructions>(){}[0]
-    final val whenFalse // io.github.itisnomatter.kojev/NoulQuestion.whenFalse|{}whenFalse[0]
-        final fun <get-whenFalse>(): kotlin/String? // io.github.itisnomatter.kojev/NoulQuestion.whenFalse.<get-whenFalse>|<get-whenFalse>(){}[0]
-    final val whenTrue // io.github.itisnomatter.kojev/NoulQuestion.whenTrue|{}whenTrue[0]
-        final fun <get-whenTrue>(): kotlin/String? // io.github.itisnomatter.kojev/NoulQuestion.whenTrue.<get-whenTrue>|<get-whenTrue>(){}[0]
-}
-
-final class io.github.itisnomatter.kojev/ScoreAnswer { // io.github.itisnomatter.kojev/ScoreAnswer|null[0]
-    final val confidence // io.github.itisnomatter.kojev/ScoreAnswer.confidence|{}confidence[0]
-        final fun <get-confidence>(): kotlin/Double // io.github.itisnomatter.kojev/ScoreAnswer.confidence.<get-confidence>|<get-confidence>(){}[0]
-    final val levels // io.github.itisnomatter.kojev/ScoreAnswer.levels|{}levels[0]
-        final fun <get-levels>(): kotlin.collections/List<kotlin/String> // io.github.itisnomatter.kojev/ScoreAnswer.levels.<get-levels>|<get-levels>(){}[0]
-    final val probabilities // io.github.itisnomatter.kojev/ScoreAnswer.probabilities|{}probabilities[0]
-        final fun <get-probabilities>(): kotlin.collections/List<kotlin/Double> // io.github.itisnomatter.kojev/ScoreAnswer.probabilities.<get-probabilities>|<get-probabilities>(){}[0]
-    final val value // io.github.itisnomatter.kojev/ScoreAnswer.value|{}value[0]
-        final fun <get-value>(): kotlin/Double // io.github.itisnomatter.kojev/ScoreAnswer.value.<get-value>|<get-value>(){}[0]
-}
-
-final class io.github.itisnomatter.kojev/ScoreQuestion { // io.github.itisnomatter.kojev/ScoreQuestion|null[0]
-    constructor <init>(kotlin/String, kotlin.collections/List<kotlin/String>) // io.github.itisnomatter.kojev/ScoreQuestion.<init>|<init>(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
-
-    final val instructions // io.github.itisnomatter.kojev/ScoreQuestion.instructions|{}instructions[0]
-        final fun <get-instructions>(): kotlin/String // io.github.itisnomatter.kojev/ScoreQuestion.instructions.<get-instructions>|<get-instructions>(){}[0]
-    final val levels // io.github.itisnomatter.kojev/ScoreQuestion.levels|{}levels[0]
-        final fun <get-levels>(): kotlin.collections/List<kotlin/String> // io.github.itisnomatter.kojev/ScoreQuestion.levels.<get-levels>|<get-levels>(){}[0]
 }
 
 final class io.github.itisnomatter.kojev/UnexpectedAnswerTypeException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException|null[0]
@@ -98,7 +72,3 @@ sealed class <#A: out kotlin/Any?> io.github.itisnomatter.kojev/QuestionKey { //
 }
 
 sealed class io.github.itisnomatter.kojev/JevResponseException : kotlin/Exception // io.github.itisnomatter.kojev/JevResponseException|null[0]
-
-final fun <#A: kotlin/Any> io.github.itisnomatter.kojev/choice(kotlin/String, io.github.itisnomatter.kojev/ChoiceQuestion<#A>): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ChoiceAnswer<#A>> // io.github.itisnomatter.kojev/choice|choice(kotlin.String;io.github.itisnomatter.kojev.ChoiceQuestion<0:0>){0§<kotlin.Any>}[0]
-final fun io.github.itisnomatter.kojev/noul(kotlin/String, io.github.itisnomatter.kojev/NoulQuestion): io.github.itisnomatter.kojev/QuestionKey<kotlin/Double> // io.github.itisnomatter.kojev/noul|noul(kotlin.String;io.github.itisnomatter.kojev.NoulQuestion){}[0]
-final fun io.github.itisnomatter.kojev/score(kotlin/String, io.github.itisnomatter.kojev/ScoreQuestion): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ScoreAnswer> // io.github.itisnomatter.kojev/score|score(kotlin.String;io.github.itisnomatter.kojev.ScoreQuestion){}[0]

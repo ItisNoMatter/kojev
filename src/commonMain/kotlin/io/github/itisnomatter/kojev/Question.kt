@@ -1,41 +1,47 @@
 package io.github.itisnomatter.kojev
 
-/**
- * Asks whether a statement holds, or a yes/no question, against the request's state. The
- * answer is the probability of "yes" - not a confidence value, Noul doesn't have one.
- */
-class NoulQuestion(
+// These are the internal representations behind a QuestionKey. The public way to build a
+// question is the DSL layer; nothing here is part of the published API.
+
+internal class NoulQuestion(
     val instructions: String,
     val whenTrue: String? = null,
     val whenFalse: String? = null,
 )
 
-/**
- * Asks the model to pick one option out of [criteria]'s keys.
- *
- * @param label the exact string sent on the wire for each option, and matched back against
- *   the response. Must be injective: two options must never produce the same label.
- */
-class ChoiceQuestion<T : Any>(
+internal class ChoiceQuestion<T : Any>(
     val instructions: String,
-    val criteria: Map<T, String?>,
+    val options: List<T>,
     val label: (T) -> String,
+    val description: (T) -> String?,
 ) {
     init {
-        require(criteria.isNotEmpty()) { "Choice criteria must not be empty." }
+        require(options.isNotEmpty()) { "Choice criteria must not be empty." }
+        require(options.size <= MAX_OPTIONS) { "Choice criteria may have at most $MAX_OPTIONS options, got ${options.size}." }
+        require(options.toSet().size == options.size) { "Choice options must be distinct." }
+        val labels = options.map(label)
+        require(labels.toSet().size == labels.size) { "Choice labels must be distinct, got $labels." }
+    }
+
+    private companion object {
+        const val MAX_OPTIONS = 255
     }
 }
 
-/**
- * Asks the model to rate the state against an ordered rubric. [levels] are in ascending
- * order; the API assigns level numbers 0, 1, 2, ... by position - there is no way to request
- * custom level numbers.
- */
-class ScoreQuestion(
+internal class ScoreQuestion<T : Any>(
     val instructions: String,
-    val levels: List<String>,
+    val levels: List<T>,
+    val description: (T) -> String,
 ) {
     init {
-        require(levels.size in 2..10) { "Score levels must be between 2 and 10, got ${levels.size}." }
+        require(levels.size in MIN_LEVELS..MAX_LEVELS) {
+            "Score levels must be between $MIN_LEVELS and $MAX_LEVELS, got ${levels.size}."
+        }
+        require(levels.toSet().size == levels.size) { "Score levels must be distinct." }
+    }
+
+    private companion object {
+        const val MIN_LEVELS = 2
+        const val MAX_LEVELS = 10
     }
 }

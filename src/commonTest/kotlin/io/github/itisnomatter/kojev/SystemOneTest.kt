@@ -17,7 +17,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class SystemOneTest {
-    private enum class Department { BILLING, TECHNICAL }
+    private enum class Department(
+        override val description: String,
+    ) : Criterion {
+        BILLING("Billing"),
+        TECHNICAL("Technical"),
+    }
 
     @Test
     fun `buildRequest requires at least one question`() {
@@ -44,15 +49,7 @@ class SystemOneTest {
     @Test
     fun `buildRequest assembles every question under the shared state and model`() {
         val angryQ = noul("is_angry", NoulQuestion(instructions = "Is the customer angry?"))
-        val deptQ =
-            choice(
-                "department",
-                ChoiceQuestion(
-                    instructions = "Which team?",
-                    criteria = linkedMapOf(Department.BILLING to "Billing", Department.TECHNICAL to null),
-                    label = { it.name.lowercase() },
-                ),
-            )
+        val deptQ = choice<Department>("department", instructions = "Which team?")
 
         val request = buildRequest(model = "jev-latest", state = "Refund please.", keys = listOf(angryQ, deptQ))
 
@@ -62,7 +59,14 @@ class SystemOneTest {
             mapOf(
                 "is_angry" to NoulQuestionDto(instructions = "Is the customer angry?"),
                 "department" to
-                    ChoiceQuestionDto(instructions = "Which team?", criteria = linkedMapOf("billing" to "Billing", "technical" to null)),
+                    ChoiceQuestionDto(
+                        instructions = "Which team?",
+                        criteria =
+                            linkedMapOf(
+                                "billing" to "Billing",
+                                "technical" to "Technical",
+                            ),
+                    ),
             ),
             request.questions,
         )
