@@ -22,6 +22,8 @@ Phases 1 through 5 are designed to be completable without one.
 
 ## Phase 1: Research
 
+Before starting: `gh issue list --label deferred` — read every issue that says it is decided in Phase 1. (See "Deferred decisions" below.)
+
 **Write no implementation code.**
 
 Read:
@@ -51,6 +53,8 @@ This file becomes the sole basis for everything that follows. Do not move on whi
 
 ## Phase 2: Skeleton
 
+Before starting: `gh issue list --label deferred` — read every issue that says it is decided in Phase 2.
+
 - Gradle setup, KMP targets, module layout
 - ktlint
 - Add `binary-compatibility-validator` and track `api/*.api` in git,
@@ -70,6 +74,8 @@ Report once an empty build is green on every target and CI passes on a PR.
 
 ## Phase 3: Domain layer
 
+Before starting: `gh issue list --label deferred` — read every issue that says it is decided in Phase 3.
+
 - Choice, Score, and Noul types
 - `QuestionKey<T>` and typed result lookup
 - Request and response serialization
@@ -80,6 +86,9 @@ Write `MockEngine` tests alongside. Base mock JSON on `docs/api-notes.md`.
 
 ## Phase 4: DSL layer
 
+Before starting: `gh issue list --label deferred` — read every issue that says it is decided in Phase 4.
+They are requirements for the design, not optional reading.
+
 `JevClient { }` and `decide { }`. **This is the heart of the project.**
 
 Build it while checking how it reads in real sample code.
@@ -88,6 +97,8 @@ If the shape should differ from the sketch in `../AGENTS.md`, propose the change
 ---
 
 ## Phase 5: Transport
+
+Before starting: `gh issue list --label deferred` — read every issue that says it is decided in Phase 5.
 
 - Retries (408 / 429 / 5xx, exponential backoff with jitter, `Retry-After`)
 - The error hierarchy and request ids
@@ -98,6 +109,10 @@ Everything to this point must be reachable without an API key.
 ---
 
 ## Phase 6: Polish and release
+
+Before starting: `gh issue list --label deferred` — read every issue that says it is decided in Phase 6.
+Several were parked here on purpose because `examples/` is the first real usage code; decide them
+while writing the examples, not before.
 
 - README: what Jev is and is not, where the key belongs, how this differs from existing clients,
   and that the project is unofficial
@@ -114,6 +129,19 @@ Everything to this point must be reachable without an API key.
 
 **Stop at the end of each phase, report, and wait for approval before continuing.**
 Do not implement several phases in one go.
+
+### Deferred decisions
+
+A decision that is consciously postponed is recorded as a GitHub Issue with the `deferred` label,
+never only in a PR description or a chat - those stop being read. Each such issue:
+
+- starts with a `Decide in: Phase N` line, and carries the phase in its title, so that
+  `gh issue list --label deferred` alone shows what is due when
+- records the reasoning for postponing, and the premises the decision depends on, so that the
+  argument is not re-run from scratch later
+
+Each phase above begins by reading the issues that name it. When you postpone something yourself,
+open the issue in the same form and point it at the phase that will have the information to decide.
 
 ### Branching
 

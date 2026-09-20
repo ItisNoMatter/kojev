@@ -185,3 +185,11 @@ That is Jev's primary use, so asking several questions at once must be the natur
 - Everything committed to this repository is written in English:
   documentation, code comments, commit messages, and PR descriptions.
   This holds regardless of the language of the conversation.
+
+## Deferred decisions
+
+Decisions that were consciously postponed live in GitHub Issues with the `deferred` label
+(`gh issue list --label deferred`), each naming the phase that decides it. `docs/bootstrap.md`
+makes every phase read its own before starting. Read the recorded reasoning before touching
+anything one of them covers - do not re-decide from scratch. When you postpone something, record
+it the same way; a PR description or a chat is not a record.
