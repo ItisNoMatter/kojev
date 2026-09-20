@@ -10,7 +10,6 @@ import io.github.itisnomatter.kojev.wire.QuestionDto
 import io.github.itisnomatter.kojev.wire.ScoreAnswerDto
 import io.github.itisnomatter.kojev.wire.ScoreQuestionDto
 import io.github.itisnomatter.kojev.wire.wireType
-import kotlin.enums.enumEntries
 
 /**
  * A named question, tied to the type that looking it up in a [Decision] returns. There is no
@@ -140,18 +139,3 @@ internal fun <T : Any> score(
     name: String,
     question: ScoreQuestion<T>,
 ): QuestionKey<ScoreAnswer<T>> = ScoreKey(name, question)
-
-/** A Choice over every constant of [T], described by the constants themselves. */
-internal inline fun <reified T> choice(
-    name: String,
-    instructions: String,
-    noinline label: (T) -> String = { it.name.lowercase() },
-): QuestionKey<ChoiceAnswer<T>> where T : Enum<T>, T : Criterion =
-    choice(name, ChoiceQuestion(instructions, enumEntries<T>(), label) { it.description })
-
-/** A Score whose rubric is every constant of [T] in declaration order, lowest level first. */
-internal inline fun <reified T> score(
-    name: String,
-    instructions: String,
-): QuestionKey<ScoreAnswer<T>> where T : Enum<T>, T : Criterion =
-    score(name, ScoreQuestion(instructions, enumEntries<T>()) { it.description })

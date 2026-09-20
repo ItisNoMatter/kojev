@@ -12,6 +12,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -27,7 +28,7 @@ class SystemOneTest {
     @Test
     fun `buildRequest requires at least one question`() {
         assertFailsWith<IllegalArgumentException> {
-            buildRequest(model = "jev-latest", state = "...", keys = emptyList())
+            buildRequest(model = "jev-latest", state = JsonPrimitive("..."), keys = emptyList())
         }
     }
 
@@ -36,7 +37,7 @@ class SystemOneTest {
         assertFailsWith<IllegalArgumentException> {
             buildRequest(
                 model = "jev-latest",
-                state = "...",
+                state = JsonPrimitive("..."),
                 keys =
                     listOf(
                         noul("dup", NoulQuestion(instructions = "a")),
@@ -51,9 +52,9 @@ class SystemOneTest {
         val angryQ = noul("is_angry", NoulQuestion(instructions = "Is the customer angry?"))
         val deptQ = choice<Department>("department", instructions = "Which team?")
 
-        val request = buildRequest(model = "jev-latest", state = "Refund please.", keys = listOf(angryQ, deptQ))
+        val request = buildRequest(model = "jev-latest", state = JsonPrimitive("Refund please."), keys = listOf(angryQ, deptQ))
 
-        assertEquals("Refund please.", request.state)
+        assertEquals(JsonPrimitive("Refund please."), request.state)
         assertEquals("jev-latest", request.model)
         assertEquals(
             mapOf(
@@ -93,7 +94,7 @@ class SystemOneTest {
                     httpClient = client,
                     baseUrl = "https://api.typesafe.ai",
                     model = "jev-latest",
-                    state = "Cancel my order and refund me right now.",
+                    state = JsonPrimitive("Cancel my order and refund me right now."),
                     keys = listOf(angryQ),
                 )
 

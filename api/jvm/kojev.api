@@ -4,13 +4,47 @@ public final class io/github/itisnomatter/kojev/ChoiceAnswer {
 	public final fun getValue ()Ljava/lang/Object;
 }
 
+public final class io/github/itisnomatter/kojev/ChoiceOptions {
+	public final fun describedAs (Ljava/lang/Object;Ljava/lang/String;)V
+}
+
 public abstract interface class io/github/itisnomatter/kojev/Criterion {
 	public abstract fun getDescription ()Ljava/lang/String;
+}
+
+public final class io/github/itisnomatter/kojev/DecideKt {
+	public static final fun decide (Lio/github/itisnomatter/kojev/JevClient;Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/itisnomatter/kojev/Decision {
 	public final fun get (Lio/github/itisnomatter/kojev/QuestionKey;)Ljava/lang/Object;
 	public final fun getModel ()Ljava/lang/String;
+	public final fun getUsage ()Lio/github/itisnomatter/kojev/Usage;
+}
+
+public final class io/github/itisnomatter/kojev/DecisionBuilder {
+	public final fun ask ([Lio/github/itisnomatter/kojev/QuestionKey;)V
+}
+
+public final class io/github/itisnomatter/kojev/JevClient : java/lang/AutoCloseable {
+	public fun close ()V
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getModel ()Ljava/lang/String;
+	public final fun getTimeout-UwyO8pc ()J
+}
+
+public final class io/github/itisnomatter/kojev/JevClientConfig {
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getModel ()Ljava/lang/String;
+	public final fun getTimeout-UwyO8pc ()J
+	public final fun setBaseUrl (Ljava/lang/String;)V
+	public final fun setModel (Ljava/lang/String;)V
+	public final fun setTimeout-LRDsOJo (J)V
+}
+
+public final class io/github/itisnomatter/kojev/JevClientKt {
+	public static final fun JevClient (Ljava/lang/String;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;)Lio/github/itisnomatter/kojev/JevClient;
+	public static synthetic fun JevClient$default (Ljava/lang/String;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/itisnomatter/kojev/JevClient;
 }
 
 public abstract class io/github/itisnomatter/kojev/JevResponseException : java/lang/Exception {
@@ -26,8 +60,23 @@ public final class io/github/itisnomatter/kojev/MissingAnswerException : io/gith
 	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
 }
 
+public final class io/github/itisnomatter/kojev/NoulCriteria {
+	public final fun getWhenFalse ()Ljava/lang/String;
+	public final fun getWhenTrue ()Ljava/lang/String;
+	public final fun setWhenFalse (Ljava/lang/String;)V
+	public final fun setWhenTrue (Ljava/lang/String;)V
+}
+
 public abstract class io/github/itisnomatter/kojev/QuestionKey {
 	public abstract fun getName ()Ljava/lang/String;
+}
+
+public final class io/github/itisnomatter/kojev/QuestionsKt {
+	public static final fun choice (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/itisnomatter/kojev/QuestionKey;
+	public static final fun choiceOfEntries (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/itisnomatter/kojev/QuestionKey;
+	public static final fun noul (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/itisnomatter/kojev/QuestionKey;
+	public static synthetic fun noul$default (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/itisnomatter/kojev/QuestionKey;
+	public static final fun scoreOfEntries (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/itisnomatter/kojev/QuestionKey;
 }
 
 public final class io/github/itisnomatter/kojev/ScoreAnswer {
@@ -46,5 +95,10 @@ public final class io/github/itisnomatter/kojev/UnexpectedAnswerTypeException : 
 public final class io/github/itisnomatter/kojev/UnknownChoiceLabelException : io/github/itisnomatter/kojev/JevResponseException {
 	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
 	public final fun getLabel ()Ljava/lang/String;
+}
+
+public final class io/github/itisnomatter/kojev/Usage {
+	public final fun getInputTokens ()I
+	public final fun getOutputTokens ()I
 }
 

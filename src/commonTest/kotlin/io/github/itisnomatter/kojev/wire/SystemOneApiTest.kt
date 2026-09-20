@@ -10,6 +10,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -50,7 +51,7 @@ class SystemOneApiTest {
                 )
             val request =
                 SystemOneRequestDto(
-                    state = "Help! My payouts have been failing for 3 days.",
+                    state = JsonPrimitive("Help! My payouts have been failing for 3 days."),
                     model = "jev-latest",
                     questions =
                         mapOf(
