@@ -126,9 +126,9 @@ val angryQ = noul("is_angry") {
 
 val urgencyQ = score("urgency") {
     instructions = "How urgently does this need a response?"
-    level(1, "Not time-sensitive")
-    level(3, "Should be handled today")
-    level(5, "Needs immediate attention")
+    level("Not time-sensitive")
+    level("Should be handled today")
+    level("Needs immediate attention")
 }
 
 val result = jev.decide {
@@ -141,7 +141,7 @@ val dist: Map<Intent, Double> = result[intentQ].probabilities
 val conf: Double = result[intentQ].confidence
 
 val angry: Double = result[angryQ]                    // the probability itself; no .confidence
-val urgency: Int = result[urgencyQ].value
+val urgency: Double = result[urgencyQ].value          // probability-weighted mean; not one of the level numbers
 ```
 
 Notes:
@@ -149,6 +149,10 @@ Notes:
 - The mapping between wire labels and Kotlin identifiers is explicit (`@SerialName` or similar)
 - Confidence-gating helpers are welcome (e.g. `result[intentQ].orNull(minConfidence = 0.8)`),
   but ship no default threshold
+- Score levels are numbered `0, 1, 2, ...` by registration order; the API has no concept of
+  caller-chosen level numbers. `result[scoreQ].value` is a `Double` (the probability-weighted
+  mean of the level numbers), not necessarily an integer or one of the level numbers itself.
+  See `docs/api-notes.md` for the confirmed response shape.
 
 Every question in one request is evaluated in parallel against the same state.
 That is Jev's primary use, so asking several questions at once must be the natural thing to write.
