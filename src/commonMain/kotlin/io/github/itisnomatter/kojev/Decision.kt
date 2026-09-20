@@ -13,6 +13,9 @@ class Decision internal constructor(
     /** The versioned model id that actually answered - may differ from an alias in the request. */
     val model: String = response.model
 
+    /** Token usage of this request. */
+    val usage: Usage = Usage(response.usage.inputTokens, response.usage.outputTokens)
+
     operator fun <T> get(key: QuestionKey<T>): T {
         val answer = response.answers[key.name] ?: throw MissingAnswerException(key)
         return key.parse(answer)

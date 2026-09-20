@@ -11,6 +11,10 @@ abstract interface io.github.itisnomatter.kojev/Criterion { // io.github.itisnom
         abstract fun <get-description>(): kotlin/String // io.github.itisnomatter.kojev/Criterion.description.<get-description>|<get-description>(){}[0]
 }
 
+final class <#A: kotlin/Any> io.github.itisnomatter.kojev/ChoiceOptions { // io.github.itisnomatter.kojev/ChoiceOptions|null[0]
+    final fun (#A).describedAs(kotlin/String?) // io.github.itisnomatter.kojev/ChoiceOptions.describedAs|describedAs@1:0(kotlin.String?){}[0]
+}
+
 final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ChoiceAnswer { // io.github.itisnomatter.kojev/ChoiceAnswer|null[0]
     final val confidence // io.github.itisnomatter.kojev/ChoiceAnswer.confidence|{}confidence[0]
         final fun <get-confidence>(): kotlin/Double // io.github.itisnomatter.kojev/ChoiceAnswer.confidence.<get-confidence>|<get-confidence>(){}[0]
@@ -34,8 +38,37 @@ final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ScoreAnswer { // io.g
 final class io.github.itisnomatter.kojev/Decision { // io.github.itisnomatter.kojev/Decision|null[0]
     final val model // io.github.itisnomatter.kojev/Decision.model|{}model[0]
         final fun <get-model>(): kotlin/String // io.github.itisnomatter.kojev/Decision.model.<get-model>|<get-model>(){}[0]
+    final val usage // io.github.itisnomatter.kojev/Decision.usage|{}usage[0]
+        final fun <get-usage>(): io.github.itisnomatter.kojev/Usage // io.github.itisnomatter.kojev/Decision.usage.<get-usage>|<get-usage>(){}[0]
 
     final fun <#A1: kotlin/Any?> get(io.github.itisnomatter.kojev/QuestionKey<#A1>): #A1 // io.github.itisnomatter.kojev/Decision.get|get(io.github.itisnomatter.kojev.QuestionKey<0:0>){0§<kotlin.Any?>}[0]
+}
+
+final class io.github.itisnomatter.kojev/DecisionBuilder { // io.github.itisnomatter.kojev/DecisionBuilder|null[0]
+    final fun ask(kotlin/Array<out io.github.itisnomatter.kojev/QuestionKey<*>>...) // io.github.itisnomatter.kojev/DecisionBuilder.ask|ask(kotlin.Array<out|io.github.itisnomatter.kojev.QuestionKey<*>>...){}[0]
+}
+
+final class io.github.itisnomatter.kojev/JevClient : kotlin/AutoCloseable { // io.github.itisnomatter.kojev/JevClient|null[0]
+    final val baseUrl // io.github.itisnomatter.kojev/JevClient.baseUrl|{}baseUrl[0]
+        final fun <get-baseUrl>(): kotlin/String // io.github.itisnomatter.kojev/JevClient.baseUrl.<get-baseUrl>|<get-baseUrl>(){}[0]
+    final val model // io.github.itisnomatter.kojev/JevClient.model|{}model[0]
+        final fun <get-model>(): kotlin/String // io.github.itisnomatter.kojev/JevClient.model.<get-model>|<get-model>(){}[0]
+    final val timeout // io.github.itisnomatter.kojev/JevClient.timeout|{}timeout[0]
+        final fun <get-timeout>(): kotlin.time/Duration // io.github.itisnomatter.kojev/JevClient.timeout.<get-timeout>|<get-timeout>(){}[0]
+
+    final fun close() // io.github.itisnomatter.kojev/JevClient.close|close(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/JevClientConfig { // io.github.itisnomatter.kojev/JevClientConfig|null[0]
+    final var baseUrl // io.github.itisnomatter.kojev/JevClientConfig.baseUrl|{}baseUrl[0]
+        final fun <get-baseUrl>(): kotlin/String // io.github.itisnomatter.kojev/JevClientConfig.baseUrl.<get-baseUrl>|<get-baseUrl>(){}[0]
+        final fun <set-baseUrl>(kotlin/String) // io.github.itisnomatter.kojev/JevClientConfig.baseUrl.<set-baseUrl>|<set-baseUrl>(kotlin.String){}[0]
+    final var model // io.github.itisnomatter.kojev/JevClientConfig.model|{}model[0]
+        final fun <get-model>(): kotlin/String // io.github.itisnomatter.kojev/JevClientConfig.model.<get-model>|<get-model>(){}[0]
+        final fun <set-model>(kotlin/String) // io.github.itisnomatter.kojev/JevClientConfig.model.<set-model>|<set-model>(kotlin.String){}[0]
+    final var timeout // io.github.itisnomatter.kojev/JevClientConfig.timeout|{}timeout[0]
+        final fun <get-timeout>(): kotlin.time/Duration // io.github.itisnomatter.kojev/JevClientConfig.timeout.<get-timeout>|<get-timeout>(){}[0]
+        final fun <set-timeout>(kotlin.time/Duration) // io.github.itisnomatter.kojev/JevClientConfig.timeout.<set-timeout>|<set-timeout>(kotlin.time.Duration){}[0]
 }
 
 final class io.github.itisnomatter.kojev/MalformedAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MalformedAnswerException|null[0]
@@ -48,6 +81,15 @@ final class io.github.itisnomatter.kojev/MalformedAnswerException : io.github.it
 final class io.github.itisnomatter.kojev/MissingAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MissingAnswerException|null[0]
     final val key // io.github.itisnomatter.kojev/MissingAnswerException.key|{}key[0]
         final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/MissingAnswerException.key.<get-key>|<get-key>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/NoulCriteria { // io.github.itisnomatter.kojev/NoulCriteria|null[0]
+    final var whenFalse // io.github.itisnomatter.kojev/NoulCriteria.whenFalse|{}whenFalse[0]
+        final fun <get-whenFalse>(): kotlin/String? // io.github.itisnomatter.kojev/NoulCriteria.whenFalse.<get-whenFalse>|<get-whenFalse>(){}[0]
+        final fun <set-whenFalse>(kotlin/String?) // io.github.itisnomatter.kojev/NoulCriteria.whenFalse.<set-whenFalse>|<set-whenFalse>(kotlin.String?){}[0]
+    final var whenTrue // io.github.itisnomatter.kojev/NoulCriteria.whenTrue|{}whenTrue[0]
+        final fun <get-whenTrue>(): kotlin/String? // io.github.itisnomatter.kojev/NoulCriteria.whenTrue.<get-whenTrue>|<get-whenTrue>(){}[0]
+        final fun <set-whenTrue>(kotlin/String?) // io.github.itisnomatter.kojev/NoulCriteria.whenTrue.<set-whenTrue>|<set-whenTrue>(kotlin.String?){}[0]
 }
 
 final class io.github.itisnomatter.kojev/UnexpectedAnswerTypeException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException|null[0]
@@ -66,9 +108,26 @@ final class io.github.itisnomatter.kojev/UnknownChoiceLabelException : io.github
         final fun <get-label>(): kotlin/String // io.github.itisnomatter.kojev/UnknownChoiceLabelException.label.<get-label>|<get-label>(){}[0]
 }
 
+final class io.github.itisnomatter.kojev/Usage { // io.github.itisnomatter.kojev/Usage|null[0]
+    final val inputTokens // io.github.itisnomatter.kojev/Usage.inputTokens|{}inputTokens[0]
+        final fun <get-inputTokens>(): kotlin/Int // io.github.itisnomatter.kojev/Usage.inputTokens.<get-inputTokens>|<get-inputTokens>(){}[0]
+    final val outputTokens // io.github.itisnomatter.kojev/Usage.outputTokens|{}outputTokens[0]
+        final fun <get-outputTokens>(): kotlin/Int // io.github.itisnomatter.kojev/Usage.outputTokens.<get-outputTokens>|<get-outputTokens>(){}[0]
+}
+
 sealed class <#A: out kotlin/Any?> io.github.itisnomatter.kojev/QuestionKey { // io.github.itisnomatter.kojev/QuestionKey|null[0]
     abstract val name // io.github.itisnomatter.kojev/QuestionKey.name|{}name[0]
         abstract fun <get-name>(): kotlin/String // io.github.itisnomatter.kojev/QuestionKey.name.<get-name>|<get-name>(){}[0]
 }
 
 sealed class io.github.itisnomatter.kojev/JevResponseException : kotlin/Exception // io.github.itisnomatter.kojev/JevResponseException|null[0]
+
+final fun <#A: io.github.itisnomatter.kojev/Criterion & kotlin/Enum<#A>> io.github.itisnomatter.kojev/choiceOfEntries(kotlin/String, kotlin/String, kotlin.collections/List<#A>): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ChoiceAnswer<#A>> // io.github.itisnomatter.kojev/choiceOfEntries|choiceOfEntries(kotlin.String;kotlin.String;kotlin.collections.List<0:0>){0§<kotlin.Enum<0:0>&io.github.itisnomatter.kojev.Criterion>}[0]
+final fun <#A: io.github.itisnomatter.kojev/Criterion & kotlin/Enum<#A>> io.github.itisnomatter.kojev/scoreOfEntries(kotlin/String, kotlin/String, kotlin.collections/List<#A>): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ScoreAnswer<#A>> // io.github.itisnomatter.kojev/scoreOfEntries|scoreOfEntries(kotlin.String;kotlin.String;kotlin.collections.List<0:0>){0§<kotlin.Enum<0:0>&io.github.itisnomatter.kojev.Criterion>}[0]
+final fun <#A: kotlin/Any> io.github.itisnomatter.kojev/choice(kotlin/String, kotlin/String, kotlin/Function1<#A, kotlin/String>, kotlin/Function1<io.github.itisnomatter.kojev/ChoiceOptions<#A>, kotlin/Unit>): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ChoiceAnswer<#A>> // io.github.itisnomatter.kojev/choice|choice(kotlin.String;kotlin.String;kotlin.Function1<0:0,kotlin.String>;kotlin.Function1<io.github.itisnomatter.kojev.ChoiceOptions<0:0>,kotlin.Unit>){0§<kotlin.Any>}[0]
+final fun io.github.itisnomatter.kojev/JevClient(kotlin/String, io.ktor.client.engine/HttpClientEngine, kotlin/Function1<io.github.itisnomatter.kojev/JevClientConfig, kotlin/Unit> = ...): io.github.itisnomatter.kojev/JevClient // io.github.itisnomatter.kojev/JevClient|JevClient(kotlin.String;io.ktor.client.engine.HttpClientEngine;kotlin.Function1<io.github.itisnomatter.kojev.JevClientConfig,kotlin.Unit>){}[0]
+final fun io.github.itisnomatter.kojev/noul(kotlin/String, kotlin/String, kotlin/Function1<io.github.itisnomatter.kojev/NoulCriteria, kotlin/Unit> = ...): io.github.itisnomatter.kojev/QuestionKey<kotlin/Double> // io.github.itisnomatter.kojev/noul|noul(kotlin.String;kotlin.String;kotlin.Function1<io.github.itisnomatter.kojev.NoulCriteria,kotlin.Unit>){}[0]
+final inline fun <#A: reified io.github.itisnomatter.kojev/Criterion & kotlin/Enum<#A>> io.github.itisnomatter.kojev/choice(kotlin/String, kotlin/String): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ChoiceAnswer<#A>> // io.github.itisnomatter.kojev/choice|choice(kotlin.String;kotlin.String){0§<kotlin.Enum<0:0>&io.github.itisnomatter.kojev.Criterion>}[0]
+final inline fun <#A: reified io.github.itisnomatter.kojev/Criterion & kotlin/Enum<#A>> io.github.itisnomatter.kojev/score(kotlin/String, kotlin/String): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ScoreAnswer<#A>> // io.github.itisnomatter.kojev/score|score(kotlin.String;kotlin.String){0§<kotlin.Enum<0:0>&io.github.itisnomatter.kojev.Criterion>}[0]
+final suspend fun <#A: kotlin/Any> (io.github.itisnomatter.kojev/JevClient).io.github.itisnomatter.kojev/decide(#A, kotlinx.serialization/SerializationStrategy<#A>, kotlin/Function1<io.github.itisnomatter.kojev/DecisionBuilder, kotlin/Unit>): io.github.itisnomatter.kojev/Decision // io.github.itisnomatter.kojev/decide|decide@io.github.itisnomatter.kojev.JevClient(0:0;kotlinx.serialization.SerializationStrategy<0:0>;kotlin.Function1<io.github.itisnomatter.kojev.DecisionBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final suspend inline fun <#A: reified kotlin/Any> (io.github.itisnomatter.kojev/JevClient).io.github.itisnomatter.kojev/decide(#A, noinline kotlin/Function1<io.github.itisnomatter.kojev/DecisionBuilder, kotlin/Unit>): io.github.itisnomatter.kojev/Decision // io.github.itisnomatter.kojev/decide|decide@io.github.itisnomatter.kojev.JevClient(0:0;kotlin.Function1<io.github.itisnomatter.kojev.DecisionBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]

@@ -114,12 +114,6 @@ class QuestionKeyTest {
         )
     }
 
-    @Test
-    fun `choice label can be overridden`() {
-        val key = choice<Department>("department", instructions = "...", label = { it.name })
-        assertEquals(setOf("BILLING", "TECHNICAL_SUPPORT", "SALES"), (key.toDto() as ChoiceQuestionDto).criteria.keys)
-    }
-
     private enum class CaseClash(
         override val description: String,
     ) : Criterion {

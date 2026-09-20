@@ -102,12 +102,10 @@ with the same properties (type-safe, declarative, pleasant in the way Compose is
 but discuss it before implementing.
 
 ```kotlin
-val jev = JevClient {
-    apiKey = System.getenv("TYPESAFE_API_KEY")
-    baseUrl = "https://api.typesafe.ai"
-    model = "jev-latest"
-    timeout = 10.seconds
-    engine = CIO.create()
+// What is required is a parameter; what is optional goes in the trailing lambda.
+val jev = JevClient(apiKey = System.getenv("TYPESAFE_API_KEY"), engine = CIO.create()) {
+    model = "jev-1.13.0"     // default "jev-latest"
+    timeout = 10.seconds     // default 10s
 }
 
 // The caller's own enum carries the descriptions: a constant without one is a compile error.
@@ -118,12 +116,9 @@ enum class Intent(override val description: String) : Criterion {
 }
 
 // Questions are values, usable outside the decide block
-val intentQ = choice<Intent>("intent") {
-    instructions = "Which team should handle this request?"
-}
+val intentQ = choice<Intent>("intent", "Which team should handle this request?")
 
-val angryQ = noul("is_angry") {
-    instructions = "Is the customer expressing anger?"
+val angryQ = noul("is_angry", "Is the customer expressing anger?") {
     whenTrue = "Clear irritation or forceful tone"
     whenFalse = "Neutral or calm"
 }
@@ -135,12 +130,13 @@ enum class Urgency(override val description: String) : Criterion {
     NOW("Needs immediate attention"),
 }
 
-val urgencyQ = score<Urgency>("urgency") {
-    instructions = "How urgently does this need a response?"
-}
+val urgencyQ = score<Urgency>("urgency", "How urgently does this need a response?")
 
-val result = jev.decide {
-    state("Cancel my order and refund me right now.")
+// The state is any @Serializable value: a String, or a structure sent as a JSON object/array.
+@Serializable
+data class Ticket(val subject: String, val body: String, val priorContacts: Int)
+
+val result = jev.decide(ticket) {
     ask(intentQ, angryQ, urgencyQ)
 }
 
@@ -154,9 +150,17 @@ val urgency = result[urgencyQ]                        // no .value - see the Sco
 val mean: Double = urgency.score                      // probability-weighted mean of the level numbers
 val likely: Urgency = urgency.mostLikely              // the mode of the distribution
 val levels: Map<Urgency, Double> = urgency.probabilities
+
+val tokens: Int = result.usage.inputTokens            // every response carries usage
 ```
 
 Notes:
+- **Required things are parameters, optional things are in the lambda.** `instructions`, the
+  API key, the engine, and the state are parameters, so forgetting one is a compile error; a
+  `var` inside a lambda can only be checked at runtime. This is the same reasoning as `Criterion`.
+  Where nothing is optional - a Choice or Score over a `Criterion` enum - there is no lambda.
+- `decide(state) { ask(...) }` keeps the state as a parameter and the questions in the block so
+  that the boundary between the two stays readable when several questions are asked.
 - The primary form for Choice and Score is an `enum` implementing `Criterion`: the descriptions
   live on the enum, so adding a constant without one fails to compile, and the description sits
   next to what it describes. An escape hatch keeps the explicit map form
@@ -164,9 +168,10 @@ Notes:
   `sealed interface` objects, or asking the same type with a different wording.
 - In the `Criterion` form the Choice wire label is the constant's `name.lowercase()`
   (`TECHNICAL_SUPPORT` → `technical_support`). The model reads labels as text next to the
-  descriptions, and every official example uses lowercase words; override the label per question
-  when something else is needed. Two constants that lowercase to the same label are rejected at
-  construction.
+  descriptions, and every official example uses lowercase words. The `Criterion` form has no
+  label override on purpose; when a different label is needed, use the explicit form
+  (`choice<T>(name, instructions, label = { ... }) { X describedAs "..." }`). Two constants that
+  lowercase to the same label are rejected at construction.
 - `ScoreAnswer` deliberately has no `value`. The API's answer is `score`, a `Double` mean over
   level numbers `0, 1, 2, ...` (declaration order); `mostLikely` is the highest-probability level
   (ties go to the lowest). Rounding the mean into a level is the caller's decision, never the

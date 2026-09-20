@@ -4,6 +4,7 @@ import io.github.itisnomatter.kojev.wire.QuestionDto
 import io.github.itisnomatter.kojev.wire.SystemOneRequestDto
 import io.github.itisnomatter.kojev.wire.callSystemOne
 import io.ktor.client.HttpClient
+import kotlinx.serialization.json.JsonElement
 
 /**
  * Assembles one request out of every question in [keys], sharing the same [state]. Every
@@ -11,7 +12,7 @@ import io.ktor.client.HttpClient
  */
 internal fun buildRequest(
     model: String,
-    state: String,
+    state: JsonElement,
     keys: List<QuestionKey<*>>,
 ): SystemOneRequestDto {
     require(keys.isNotEmpty()) { "At least one question is required." }
@@ -30,7 +31,7 @@ internal suspend fun requestDecision(
     httpClient: HttpClient,
     baseUrl: String,
     model: String,
-    state: String,
+    state: JsonElement,
     keys: List<QuestionKey<*>>,
 ): Decision {
     val request = buildRequest(model, state, keys)

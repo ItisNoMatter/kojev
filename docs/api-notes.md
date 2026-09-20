@@ -137,6 +137,9 @@ Top level (`SystemOneResponse`) [S9][S10]:
 alias supplied in the request [S9][S10]. `answers` has at least one entry, keyed by the same names
 used in the request's `questions` map, and each answer's `type` matches its question's `type` [S9].
 
+`usage.input_tokens` is the number of billable input tokens; `usage.output_tokens` is the number
+of output tokens used to answer, which the schema states are "currently free of charge" [S9][S10].
+
 ### Choice answer
 
 ```json
@@ -286,6 +289,22 @@ each other. Treat them as "the de facto official default", not as a documented c
   `description`, `release_date` [S9]
 - The response's top-level `model` field always reports the versioned id that actually answered,
   even when the request specified an alias [S9][S10] — use this to detect a silent alias move
+
+## Official SDK client defaults
+
+Both official SDKs ship the same defaults, so a client that copies them behaves like the vendor's
+own (not documented in prose anywhere; read from source) [S10][S11]:
+
+| Setting | Default | Python (`src/typesafe_sdk/constants.py`) | JS (`src/client.ts`, `src/retry.ts`) |
+|---|---|---|---|
+| Base URL | `https://api.typesafe.ai` | `DEFAULT_BASE_URL` | `DEFAULT_BASE_URL` |
+| Model | `jev-latest` | `DEFAULT_MODEL` | `DEFAULT_MODEL` |
+| Request timeout | **10 seconds** | `DEFAULT_TIMEOUT = 10.0` | `DEFAULT_TIMEOUT_MS = 10_000` |
+
+Both strip a trailing `/` from the base URL before appending paths [S10][S11]. Both also read the
+key, base URL, and model from environment variables (`TYPESAFE_API_KEY`, `TYPESAFE_BASE_URL`,
+`TYPESAFE_DEFAULT_MODEL`) [S10]; kojev does not, since environment access is platform-specific
+and the caller passes the key in.
 
 ## Known model weaknesses (jev-1.13) — relevant to DSL/design decisions
 
