@@ -54,6 +54,11 @@ inline fun <reified T> choice(
     instructions: String,
 ): QuestionKey<ChoiceAnswer<T>> where T : Enum<T>, T : Criterion = choiceOfEntries(name, instructions, enumEntries<T>())
 
+/**
+ * Internal implementation detail of [choice], visible only because reified `enumEntries<T>()`
+ * has to be inlined into the caller. Not part of kojev's public API: do not call it directly;
+ * it may change or disappear without notice and without a changelog entry.
+ */
 @PublishedApi
 internal fun <T> choiceOfEntries(
     name: String,
@@ -116,6 +121,11 @@ inline fun <reified T> score(
     instructions: String,
 ): QuestionKey<ScoreAnswer<T>> where T : Enum<T>, T : Criterion = scoreOfEntries(name, instructions, enumEntries<T>())
 
+/**
+ * Internal implementation detail of [score], visible only because reified `enumEntries<T>()`
+ * has to be inlined into the caller. Not part of kojev's public API: do not call it directly;
+ * it may change or disappear without notice and without a changelog entry.
+ */
 @PublishedApi
 internal fun <T> scoreOfEntries(
     name: String,

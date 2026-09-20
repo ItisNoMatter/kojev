@@ -25,5 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it in one request
 - `Decision.usage` with the request's input and output token counts
 
-Errors from the transport are still Ktor's own (`ResponseException` on a non-2xx status); the
-retry policy and kojev's error hierarchy come next.
+**Temporary:** a non-2xx response currently surfaces as Ktor's own `ResponseException`
+(`ClientRequestException` / `ServerResponseException`). This will be replaced by kojev's own
+exception types, split by HTTP status and carrying the request id, together with the retry
+policy in the next phase. Code that catches `ResponseException` from `decide` will need to change
+then; it is not a stable part of the API.
