@@ -1,0 +1,21 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Amper
+.amper/
+build/
+
+# Kotlin / Gradle (in case Gradle tooling is added later)
+.gradle/
+.kotlin/
+local.properties
+
+# OS
+.DS_Store
+
+# Logs
+*.log
