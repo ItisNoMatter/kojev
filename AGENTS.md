@@ -38,11 +38,13 @@ then implement. Mark any implementation whose source you cannot cite with a comm
 | Type | Question | Returns |
 |---|---|---|
 | **Choice** | Pick one option (`instructions` + a label→description map) | the label, a probability distribution, confidence |
-| **Score** | Rate against a 2–10 level rubric | the score, the level legend, a distribution, confidence |
+| **Score** | Rate against a 2–10 level rubric | the score (a `Double`: the probability-weighted mean of the level numbers), the most likely level, a distribution, confidence |
 | **Noul** | "Is this statement true?" | **a probability in 0..1. There is no confidence field** |
 
 - **Noul is not a null check.** It returns the probability that a statement holds.
 - **A Noul and a two-option Choice are not interchangeable.** Never carry a threshold between them.
+- **A Score's answer is not a level.** The mean usually falls between levels and can land on a
+  level the model gave zero probability. The library never rounds it into a level for the caller.
 - An empty Choice `criteria`, or a Score with fewer than two levels, is a request-time error.
 
 ### 3. Do not weaken type safety
@@ -108,14 +110,16 @@ val jev = JevClient {
     engine = CIO.create()
 }
 
-enum class Intent { REFUND, TECHNICAL_SUPPORT, GENERAL_INQUIRY }
+// The caller's own enum carries the descriptions: a constant without one is a compile error.
+enum class Intent(override val description: String) : Criterion {
+    REFUND("Refunds and cancellations"),
+    TECHNICAL_SUPPORT("Bugs and technical problems"),
+    GENERAL_INQUIRY("Anything else"),
+}
 
 // Questions are values, usable outside the decide block
 val intentQ = choice<Intent>("intent") {
     instructions = "Which team should handle this request?"
-    Intent.REFUND describedAs "Refunds and cancellations"
-    Intent.TECHNICAL_SUPPORT describedAs "Bugs and technical problems"
-    Intent.GENERAL_INQUIRY describedAs "Anything else"
 }
 
 val angryQ = noul("is_angry") {
@@ -124,11 +128,15 @@ val angryQ = noul("is_angry") {
     whenFalse = "Neutral or calm"
 }
 
-val urgencyQ = score("urgency") {
+// Declaration order is the rubric order, lowest level first.
+enum class Urgency(override val description: String) : Criterion {
+    LATER("Not time-sensitive"),
+    TODAY("Should be handled today"),
+    NOW("Needs immediate attention"),
+}
+
+val urgencyQ = score<Urgency>("urgency") {
     instructions = "How urgently does this need a response?"
-    level("Not time-sensitive")
-    level("Should be handled today")
-    level("Needs immediate attention")
 }
 
 val result = jev.decide {
@@ -141,18 +149,30 @@ val dist: Map<Intent, Double> = result[intentQ].probabilities
 val conf: Double = result[intentQ].confidence
 
 val angry: Double = result[angryQ]                    // the probability itself; no .confidence
-val urgency: Double = result[urgencyQ].value          // probability-weighted mean; not one of the level numbers
+
+val urgency = result[urgencyQ]                        // no .value - see the Score note below
+val mean: Double = urgency.score                      // probability-weighted mean of the level numbers
+val likely: Urgency = urgency.mostLikely              // the mode of the distribution
+val levels: Map<Urgency, Double> = urgency.probabilities
 ```
 
 Notes:
-- Choice labels bind to `enum` values and to `sealed interface` implementations alike
-- The mapping between wire labels and Kotlin identifiers is explicit (`@SerialName` or similar)
+- The primary form for Choice and Score is an `enum` implementing `Criterion`: the descriptions
+  live on the enum, so adding a constant without one fails to compile, and the description sits
+  next to what it describes. An escape hatch keeps the explicit map form
+  (`Intent.REFUND describedAs "..."`, with an explicit label) for enums the caller doesn't own,
+  `sealed interface` objects, or asking the same type with a different wording.
+- In the `Criterion` form the Choice wire label is the constant's `name.lowercase()`
+  (`TECHNICAL_SUPPORT` → `technical_support`). The model reads labels as text next to the
+  descriptions, and every official example uses lowercase words; override the label per question
+  when something else is needed. Two constants that lowercase to the same label are rejected at
+  construction.
+- `ScoreAnswer` deliberately has no `value`. The API's answer is `score`, a `Double` mean over
+  level numbers `0, 1, 2, ...` (declaration order); `mostLikely` is the highest-probability level
+  (ties go to the lowest). Rounding the mean into a level is the caller's decision, never the
+  library's. See `docs/api-notes.md` for the confirmed response shape.
 - Confidence-gating helpers are welcome (e.g. `result[intentQ].orNull(minConfidence = 0.8)`),
   but ship no default threshold
-- Score levels are numbered `0, 1, 2, ...` by registration order; the API has no concept of
-  caller-chosen level numbers. `result[scoreQ].value` is a `Double` (the probability-weighted
-  mean of the level numbers), not necessarily an integer or one of the level numbers itself.
-  See `docs/api-notes.md` for the confirmed response shape.
 
 Every question in one request is evaluated in parallel against the same state.
 That is Jev's primary use, so asking several questions at once must be the natural thing to write.

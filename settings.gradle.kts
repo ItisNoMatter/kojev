@@ -1,5 +1,3 @@
-rootProject.name = "kojev"
-
 pluginManagement {
     repositories {
         google()
@@ -7,6 +5,12 @@ pluginManagement {
         mavenCentral()
     }
 }
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
+rootProject.name = "kojev"
 
 dependencyResolutionManagement {
     repositories {

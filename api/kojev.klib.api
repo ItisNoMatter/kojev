@@ -1,0 +1,74 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.itisnomatter:kojev>
+abstract interface io.github.itisnomatter.kojev/Criterion { // io.github.itisnomatter.kojev/Criterion|null[0]
+    abstract val description // io.github.itisnomatter.kojev/Criterion.description|{}description[0]
+        abstract fun <get-description>(): kotlin/String // io.github.itisnomatter.kojev/Criterion.description.<get-description>|<get-description>(){}[0]
+}
+
+final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ChoiceAnswer { // io.github.itisnomatter.kojev/ChoiceAnswer|null[0]
+    final val confidence // io.github.itisnomatter.kojev/ChoiceAnswer.confidence|{}confidence[0]
+        final fun <get-confidence>(): kotlin/Double // io.github.itisnomatter.kojev/ChoiceAnswer.confidence.<get-confidence>|<get-confidence>(){}[0]
+    final val probabilities // io.github.itisnomatter.kojev/ChoiceAnswer.probabilities|{}probabilities[0]
+        final fun <get-probabilities>(): kotlin.collections/Map<#A, kotlin/Double> // io.github.itisnomatter.kojev/ChoiceAnswer.probabilities.<get-probabilities>|<get-probabilities>(){}[0]
+    final val value // io.github.itisnomatter.kojev/ChoiceAnswer.value|{}value[0]
+        final fun <get-value>(): #A // io.github.itisnomatter.kojev/ChoiceAnswer.value.<get-value>|<get-value>(){}[0]
+}
+
+final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ScoreAnswer { // io.github.itisnomatter.kojev/ScoreAnswer|null[0]
+    final val confidence // io.github.itisnomatter.kojev/ScoreAnswer.confidence|{}confidence[0]
+        final fun <get-confidence>(): kotlin/Double // io.github.itisnomatter.kojev/ScoreAnswer.confidence.<get-confidence>|<get-confidence>(){}[0]
+    final val mostLikely // io.github.itisnomatter.kojev/ScoreAnswer.mostLikely|{}mostLikely[0]
+        final fun <get-mostLikely>(): #A // io.github.itisnomatter.kojev/ScoreAnswer.mostLikely.<get-mostLikely>|<get-mostLikely>(){}[0]
+    final val probabilities // io.github.itisnomatter.kojev/ScoreAnswer.probabilities|{}probabilities[0]
+        final fun <get-probabilities>(): kotlin.collections/Map<#A, kotlin/Double> // io.github.itisnomatter.kojev/ScoreAnswer.probabilities.<get-probabilities>|<get-probabilities>(){}[0]
+    final val score // io.github.itisnomatter.kojev/ScoreAnswer.score|{}score[0]
+        final fun <get-score>(): kotlin/Double // io.github.itisnomatter.kojev/ScoreAnswer.score.<get-score>|<get-score>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/Decision { // io.github.itisnomatter.kojev/Decision|null[0]
+    final val model // io.github.itisnomatter.kojev/Decision.model|{}model[0]
+        final fun <get-model>(): kotlin/String // io.github.itisnomatter.kojev/Decision.model.<get-model>|<get-model>(){}[0]
+
+    final fun <#A1: kotlin/Any?> get(io.github.itisnomatter.kojev/QuestionKey<#A1>): #A1 // io.github.itisnomatter.kojev/Decision.get|get(io.github.itisnomatter.kojev.QuestionKey<0:0>){0§<kotlin.Any?>}[0]
+}
+
+final class io.github.itisnomatter.kojev/MalformedAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MalformedAnswerException|null[0]
+    final val detail // io.github.itisnomatter.kojev/MalformedAnswerException.detail|{}detail[0]
+        final fun <get-detail>(): kotlin/String // io.github.itisnomatter.kojev/MalformedAnswerException.detail.<get-detail>|<get-detail>(){}[0]
+    final val key // io.github.itisnomatter.kojev/MalformedAnswerException.key|{}key[0]
+        final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/MalformedAnswerException.key.<get-key>|<get-key>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/MissingAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MissingAnswerException|null[0]
+    final val key // io.github.itisnomatter.kojev/MissingAnswerException.key|{}key[0]
+        final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/MissingAnswerException.key.<get-key>|<get-key>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/UnexpectedAnswerTypeException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException|null[0]
+    final val actual // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.actual|{}actual[0]
+        final fun <get-actual>(): kotlin/String // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.actual.<get-actual>|<get-actual>(){}[0]
+    final val expected // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.expected|{}expected[0]
+        final fun <get-expected>(): kotlin/String // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.expected.<get-expected>|<get-expected>(){}[0]
+    final val key // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.key|{}key[0]
+        final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.key.<get-key>|<get-key>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/UnknownChoiceLabelException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnknownChoiceLabelException|null[0]
+    final val key // io.github.itisnomatter.kojev/UnknownChoiceLabelException.key|{}key[0]
+        final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/UnknownChoiceLabelException.key.<get-key>|<get-key>(){}[0]
+    final val label // io.github.itisnomatter.kojev/UnknownChoiceLabelException.label|{}label[0]
+        final fun <get-label>(): kotlin/String // io.github.itisnomatter.kojev/UnknownChoiceLabelException.label.<get-label>|<get-label>(){}[0]
+}
+
+sealed class <#A: out kotlin/Any?> io.github.itisnomatter.kojev/QuestionKey { // io.github.itisnomatter.kojev/QuestionKey|null[0]
+    abstract val name // io.github.itisnomatter.kojev/QuestionKey.name|{}name[0]
+        abstract fun <get-name>(): kotlin/String // io.github.itisnomatter.kojev/QuestionKey.name.<get-name>|<get-name>(){}[0]
+}
+
+sealed class io.github.itisnomatter.kojev/JevResponseException : kotlin/Exception // io.github.itisnomatter.kojev/JevResponseException|null[0]
