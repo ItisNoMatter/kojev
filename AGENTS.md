@@ -178,3 +178,6 @@ That is Jev's primary use, so asking several questions at once must be the natur
 - Do not fill gaps by guessing. Read the docs, or ask.
 - Prefer justified code over plausible code.
 - If something in this document is wrong, say so rather than following it.
+- Everything committed to this repository is written in English:
+  documentation, code comments, commit messages, and PR descriptions.
+  This holds regardless of the language of the conversation.
