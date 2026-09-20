@@ -1,0 +1,99 @@
+package io.github.itisnomatter.kojev
+
+import io.github.itisnomatter.kojev.wire.ChoiceQuestionDto
+import io.github.itisnomatter.kojev.wire.NoulQuestionDto
+import io.github.itisnomatter.kojev.wire.jevJson
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+
+class SystemOneTest {
+    private enum class Department { BILLING, TECHNICAL }
+
+    @Test
+    fun `buildRequest requires at least one question`() {
+        assertFailsWith<IllegalArgumentException> {
+            buildRequest(model = "jev-latest", state = "...", keys = emptyList())
+        }
+    }
+
+    @Test
+    fun `buildRequest rejects two questions with the same name`() {
+        assertFailsWith<IllegalArgumentException> {
+            buildRequest(
+                model = "jev-latest",
+                state = "...",
+                keys =
+                    listOf(
+                        noul("dup", NoulQuestion(instructions = "a")),
+                        noul("dup", NoulQuestion(instructions = "b")),
+                    ),
+            )
+        }
+    }
+
+    @Test
+    fun `buildRequest assembles every question under the shared state and model`() {
+        val angryQ = noul("is_angry", NoulQuestion(instructions = "Is the customer angry?"))
+        val deptQ =
+            choice(
+                "department",
+                ChoiceQuestion(
+                    instructions = "Which team?",
+                    criteria = linkedMapOf(Department.BILLING to "Billing", Department.TECHNICAL to null),
+                    label = { it.name.lowercase() },
+                ),
+            )
+
+        val request = buildRequest(model = "jev-latest", state = "Refund please.", keys = listOf(angryQ, deptQ))
+
+        assertEquals("Refund please.", request.state)
+        assertEquals("jev-latest", request.model)
+        assertEquals(
+            mapOf(
+                "is_angry" to NoulQuestionDto(instructions = "Is the customer angry?"),
+                "department" to
+                    ChoiceQuestionDto(instructions = "Which team?", criteria = linkedMapOf("billing" to "Billing", "technical" to null)),
+            ),
+            request.questions,
+        )
+    }
+
+    @Test
+    fun `requestDecision sends the built request and returns typed answers`() =
+        runTest {
+            val angryQ = noul("is_angry", NoulQuestion(instructions = "Is the customer angry?"))
+            val engine =
+                MockEngine {
+                    respond(
+                        content =
+                            """{"model":"jev-1.13.0","answers":{"is_angry":{"type":"noul","noul":0.9}},""" +
+                                """"usage":{"input_tokens":10,"output_tokens":2}}""",
+                        status = HttpStatusCode.OK,
+                        headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                    )
+                }
+            val client = HttpClient(engine) { install(ContentNegotiation) { json(jevJson) } }
+
+            val decision =
+                requestDecision(
+                    httpClient = client,
+                    baseUrl = "https://api.typesafe.ai",
+                    model = "jev-latest",
+                    state = "Cancel my order and refund me right now.",
+                    keys = listOf(angryQ),
+                )
+
+            assertEquals(0.9, decision[angryQ])
+            assertEquals("jev-1.13.0", decision.model)
+        }
+}

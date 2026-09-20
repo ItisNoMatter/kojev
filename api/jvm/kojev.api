@@ -1,0 +1,73 @@
+public final class io/github/itisnomatter/kojev/ChoiceAnswer {
+	public final fun getConfidence ()D
+	public final fun getProbabilities ()Ljava/util/Map;
+	public final fun getValue ()Ljava/lang/Object;
+}
+
+public final class io/github/itisnomatter/kojev/ChoiceQuestion {
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;Lkotlin/jvm/functions/Function1;)V
+	public final fun getCriteria ()Ljava/util/Map;
+	public final fun getInstructions ()Ljava/lang/String;
+	public final fun getLabel ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class io/github/itisnomatter/kojev/Decision {
+	public final fun get (Lio/github/itisnomatter/kojev/QuestionKey;)Ljava/lang/Object;
+	public final fun getModel ()Ljava/lang/String;
+}
+
+public abstract class io/github/itisnomatter/kojev/JevResponseException : java/lang/Exception {
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/itisnomatter/kojev/MalformedScoreAnswerException : io/github/itisnomatter/kojev/JevResponseException {
+	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
+	public final fun getLevel ()I
+}
+
+public final class io/github/itisnomatter/kojev/MissingAnswerException : io/github/itisnomatter/kojev/JevResponseException {
+	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
+}
+
+public final class io/github/itisnomatter/kojev/NoulQuestion {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getInstructions ()Ljava/lang/String;
+	public final fun getWhenFalse ()Ljava/lang/String;
+	public final fun getWhenTrue ()Ljava/lang/String;
+}
+
+public abstract class io/github/itisnomatter/kojev/QuestionKey {
+	public abstract fun getName ()Ljava/lang/String;
+}
+
+public final class io/github/itisnomatter/kojev/QuestionKeyKt {
+	public static final fun choice (Ljava/lang/String;Lio/github/itisnomatter/kojev/ChoiceQuestion;)Lio/github/itisnomatter/kojev/QuestionKey;
+	public static final fun noul (Ljava/lang/String;Lio/github/itisnomatter/kojev/NoulQuestion;)Lio/github/itisnomatter/kojev/QuestionKey;
+	public static final fun score (Ljava/lang/String;Lio/github/itisnomatter/kojev/ScoreQuestion;)Lio/github/itisnomatter/kojev/QuestionKey;
+}
+
+public final class io/github/itisnomatter/kojev/ScoreAnswer {
+	public final fun getConfidence ()D
+	public final fun getLevels ()Ljava/util/List;
+	public final fun getProbabilities ()Ljava/util/List;
+	public final fun getValue ()D
+}
+
+public final class io/github/itisnomatter/kojev/ScoreQuestion {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun getInstructions ()Ljava/lang/String;
+	public final fun getLevels ()Ljava/util/List;
+}
+
+public final class io/github/itisnomatter/kojev/UnexpectedAnswerTypeException : io/github/itisnomatter/kojev/JevResponseException {
+	public final fun getActual ()Ljava/lang/String;
+	public final fun getExpected ()Ljava/lang/String;
+	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
+}
+
+public final class io/github/itisnomatter/kojev/UnknownChoiceLabelException : io/github/itisnomatter/kojev/JevResponseException {
+	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
+	public final fun getLabel ()Ljava/lang/String;
+}
+
