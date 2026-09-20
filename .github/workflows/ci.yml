@@ -21,7 +21,10 @@ jobs:
           java-version: "21"
           cache: gradle
 
-      - uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses and install the compile platform
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
 
       - name: Build and test every target
         run: ./gradlew build
