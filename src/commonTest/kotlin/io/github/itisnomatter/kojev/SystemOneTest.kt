@@ -2,6 +2,7 @@ package io.github.itisnomatter.kojev
 
 import io.github.itisnomatter.kojev.wire.ChoiceQuestionDto
 import io.github.itisnomatter.kojev.wire.NoulQuestionDto
+import io.github.itisnomatter.kojev.wire.Transport
 import io.github.itisnomatter.kojev.wire.jevJson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -16,6 +17,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.time.Duration.Companion.seconds
 
 class SystemOneTest {
     private enum class Department(
@@ -88,11 +90,11 @@ class SystemOneTest {
                     )
                 }
             val client = HttpClient(engine) { install(ContentNegotiation) { json(jevJson) } }
+            val transport = Transport(client, "https://api.typesafe.ai", 10.seconds, RetryPolicy().snapshot())
 
             val decision =
                 requestDecision(
-                    httpClient = client,
-                    baseUrl = "https://api.typesafe.ai",
+                    transport = transport,
                     model = "jev-latest",
                     state = JsonPrimitive("Cancel my order and refund me right now."),
                     keys = listOf(angryQ),

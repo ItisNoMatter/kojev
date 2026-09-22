@@ -25,8 +25,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it in one request
 - `Decision.usage` with the request's input and output token counts
 
-**Temporary:** a non-2xx response currently surfaces as Ktor's own `ResponseException`
-(`ClientRequestException` / `ServerResponseException`). This will be replaced by kojev's own
-exception types, split by HTTP status and carrying the request id, together with the retry
-policy in the next phase. Code that catches `ResponseException` from `decide` will need to change
-then; it is not a stable part of the API.
+- `JevException` as the root of everything a decision throws: `JevApiException` with one subclass
+  per HTTP status (`JevAuthenticationException`, `JevRateLimitException`, `JevServerException`,
+  ...), each carrying the status, the `x-typesafe-request-id`, the raw body, and any server
+  `Retry-After`; `JevRequestValidationException` exposes a 422's documented errors structured;
+  `JevConnectionException` and `JevRequestTimeoutException` when no response arrived;
+  `JevResponseException` (existing) now sits under the same root
+- Retries with `retry { ... }` in the client config: 408 / 429 / 5xx, connection errors, and
+  timeouts; exponential backoff with jitter; `retry-after-ms` / `Retry-After` honoured up to a
+  cap; a total budget that bounds the whole decision - a wait that would exceed it throws the
+  last failure immediately with the server's `retryAfter` on it, and the last attempt's timeout
+  is shortened to what remains. Defaults match the official SDKs
+- `Decision.requestId`
+- A `jvmLiveTest` task that runs against the real API only when `TYPESAFE_API_KEY` is set
+
+### Changed
+
+- A non-2xx response no longer surfaces as Ktor's `ResponseException`; it is a `JevApiException`
+  subclass. Timeouts are per attempt.

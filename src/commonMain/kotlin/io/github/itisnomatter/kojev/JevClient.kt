@@ -1,5 +1,7 @@
 package io.github.itisnomatter.kojev
 
+import io.github.itisnomatter.kojev.wire.MIN_TIMEOUT
+import io.github.itisnomatter.kojev.wire.Transport
 import io.github.itisnomatter.kojev.wire.jevJson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
@@ -24,8 +26,15 @@ class JevClientConfig internal constructor() {
      */
     var model: String = "jev-latest"
 
-    /** How long one request may take. */
+    /** How long one attempt may take. Retries each get a fresh timeout; [RetryPolicy.totalBudget] bounds the whole decision. */
     var timeout: Duration = 10.seconds
+
+    internal val retry = RetryPolicy()
+
+    /** Adjusts how a decision is retried. See [RetryPolicy] for the settings and their defaults. */
+    fun retry(configure: RetryPolicy.() -> Unit) {
+        retry.configure()
+    }
 }
 
 /**
@@ -36,6 +45,7 @@ class JevClientConfig internal constructor() {
  * val jev = JevClient(apiKey = System.getenv("TYPESAFE_API_KEY"), engine = CIO.create()) {
  *     model = "jev-1.13.0"
  *     timeout = 5.seconds
+ *     retry { maxRetries = 3 }
  * }
  * ```
  *
@@ -51,26 +61,37 @@ fun JevClient(
     val config = JevClientConfig().apply(configure)
     require(config.baseUrl.isNotBlank()) { "baseUrl must not be blank." }
     require(config.model.isNotBlank()) { "model must not be blank." }
-    require(config.timeout.isPositive()) { "timeout must be positive, got ${config.timeout}." }
+    require(config.timeout >= MIN_TIMEOUT) { "timeout must be at least $MIN_TIMEOUT, got ${config.timeout}." }
+    val retry = config.retry.snapshot()
     val httpClient =
         HttpClient(engine) {
-            expectSuccess = true
             install(ContentNegotiation) { json(jevJson) }
             install(HttpTimeout) { requestTimeoutMillis = config.timeout.inWholeMilliseconds }
             defaultRequest { header(HttpHeaders.Authorization, "Bearer $apiKey") }
         }
-    return JevClient(httpClient, config.baseUrl.trimEnd('/'), config.model, config.timeout)
+    val baseUrl = config.baseUrl.trimEnd('/')
+    return JevClient(
+        httpClient = httpClient,
+        transport = Transport(httpClient, baseUrl, config.timeout, retry),
+        baseUrl = baseUrl,
+        model = config.model,
+        timeout = config.timeout,
+    )
 }
 
 /**
  * A handle on the Jev API. Thread-safe: create one per application and share it. Ask it
  * questions with [decide].
  *
- * A non-2xx response currently surfaces as Ktor's own `ResponseException`; a response that
- * doesn't match what was asked surfaces as a [JevResponseException].
+ * Everything a decision can fail with is a [JevException]: a non-2xx status is a
+ * [JevApiException] subclass for that status, no response is a [JevConnectionException] or
+ * [JevRequestTimeoutException], and a response that doesn't match the questions is a
+ * [JevResponseException]. Retries happen before any of these reaches the caller, per the
+ * client's [RetryPolicy].
  */
 class JevClient internal constructor(
-    internal val httpClient: HttpClient,
+    private val httpClient: HttpClient,
+    internal val transport: Transport,
     val baseUrl: String,
     val model: String,
     val timeout: Duration,

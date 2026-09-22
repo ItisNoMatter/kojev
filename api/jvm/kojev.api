@@ -19,11 +19,26 @@ public final class io/github/itisnomatter/kojev/DecideKt {
 public final class io/github/itisnomatter/kojev/Decision {
 	public final fun get (Lio/github/itisnomatter/kojev/QuestionKey;)Ljava/lang/Object;
 	public final fun getModel ()Ljava/lang/String;
+	public final fun getRequestId ()Ljava/lang/String;
 	public final fun getUsage ()Lio/github/itisnomatter/kojev/Usage;
 }
 
 public final class io/github/itisnomatter/kojev/DecisionBuilder {
 	public final fun ask ([Lio/github/itisnomatter/kojev/QuestionKey;)V
+}
+
+public abstract class io/github/itisnomatter/kojev/JevApiException : io/github/itisnomatter/kojev/JevException {
+	public synthetic fun <init> (ILjava/lang/String;Ljava/lang/String;Lkotlin/time/Duration;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getBody ()Ljava/lang/String;
+	public final fun getRequestId ()Ljava/lang/String;
+	public final fun getRetryAfter-FghU774 ()Lkotlin/time/Duration;
+	public final fun getStatus ()I
+}
+
+public final class io/github/itisnomatter/kojev/JevAuthenticationException : io/github/itisnomatter/kojev/JevApiException {
+}
+
+public final class io/github/itisnomatter/kojev/JevBadRequestException : io/github/itisnomatter/kojev/JevApiException {
 }
 
 public final class io/github/itisnomatter/kojev/JevClient : java/lang/AutoCloseable {
@@ -37,6 +52,7 @@ public final class io/github/itisnomatter/kojev/JevClientConfig {
 	public final fun getBaseUrl ()Ljava/lang/String;
 	public final fun getModel ()Ljava/lang/String;
 	public final fun getTimeout-UwyO8pc ()J
+	public final fun retry (Lkotlin/jvm/functions/Function1;)V
 	public final fun setBaseUrl (Ljava/lang/String;)V
 	public final fun setModel (Ljava/lang/String;)V
 	public final fun setTimeout-LRDsOJo (J)V
@@ -47,8 +63,44 @@ public final class io/github/itisnomatter/kojev/JevClientKt {
 	public static synthetic fun JevClient$default (Ljava/lang/String;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/itisnomatter/kojev/JevClient;
 }
 
-public abstract class io/github/itisnomatter/kojev/JevResponseException : java/lang/Exception {
-	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+public final class io/github/itisnomatter/kojev/JevConnectionException : io/github/itisnomatter/kojev/JevException {
+}
+
+public abstract class io/github/itisnomatter/kojev/JevException : java/lang/Exception {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/itisnomatter/kojev/JevNotFoundException : io/github/itisnomatter/kojev/JevApiException {
+}
+
+public final class io/github/itisnomatter/kojev/JevPermissionDeniedException : io/github/itisnomatter/kojev/JevApiException {
+}
+
+public final class io/github/itisnomatter/kojev/JevRateLimitException : io/github/itisnomatter/kojev/JevApiException {
+}
+
+public final class io/github/itisnomatter/kojev/JevRequestTimeoutException : io/github/itisnomatter/kojev/JevException {
+	public final fun getTimeout-UwyO8pc ()J
+}
+
+public final class io/github/itisnomatter/kojev/JevRequestValidationException : io/github/itisnomatter/kojev/JevApiException {
+	public final fun getErrors ()Ljava/util/List;
+}
+
+public abstract class io/github/itisnomatter/kojev/JevResponseException : io/github/itisnomatter/kojev/JevException {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/itisnomatter/kojev/JevServerException : io/github/itisnomatter/kojev/JevApiException {
+}
+
+public final class io/github/itisnomatter/kojev/JevUnexpectedStatusException : io/github/itisnomatter/kojev/JevApiException {
+}
+
+public final class io/github/itisnomatter/kojev/JevUnreadableResponseException : io/github/itisnomatter/kojev/JevResponseException {
+	public final fun getRequestId ()Ljava/lang/String;
 }
 
 public final class io/github/itisnomatter/kojev/MalformedAnswerException : io/github/itisnomatter/kojev/JevResponseException {
@@ -79,6 +131,29 @@ public final class io/github/itisnomatter/kojev/QuestionsKt {
 	public static final fun scoreOfEntries (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/itisnomatter/kojev/QuestionKey;
 }
 
+public final class io/github/itisnomatter/kojev/RetryPolicy {
+	public final fun getInitialBackoff-UwyO8pc ()J
+	public final fun getJitter ()D
+	public final fun getMaxBackoff-UwyO8pc ()J
+	public final fun getMaxRetries ()I
+	public final fun getMaxRetryAfter-UwyO8pc ()J
+	public final fun getRespectRetryAfter ()Z
+	public final fun getRetryOnConnectionError ()Z
+	public final fun getRetryOnStatuses ()Ljava/util/Set;
+	public final fun getRetryOnTimeout ()Z
+	public final fun getTotalBudget-FghU774 ()Lkotlin/time/Duration;
+	public final fun setInitialBackoff-LRDsOJo (J)V
+	public final fun setJitter (D)V
+	public final fun setMaxBackoff-LRDsOJo (J)V
+	public final fun setMaxRetries (I)V
+	public final fun setMaxRetryAfter-LRDsOJo (J)V
+	public final fun setRespectRetryAfter (Z)V
+	public final fun setRetryOnConnectionError (Z)V
+	public final fun setRetryOnStatuses (Ljava/util/Set;)V
+	public final fun setRetryOnTimeout (Z)V
+	public final fun setTotalBudget-BwNAW2A (Lkotlin/time/Duration;)V
+}
+
 public final class io/github/itisnomatter/kojev/ScoreAnswer {
 	public final fun getConfidence ()D
 	public final fun getMostLikely ()Ljava/lang/Object;
@@ -100,5 +175,12 @@ public final class io/github/itisnomatter/kojev/UnknownChoiceLabelException : io
 public final class io/github/itisnomatter/kojev/Usage {
 	public final fun getInputTokens ()I
 	public final fun getOutputTokens ()I
+}
+
+public final class io/github/itisnomatter/kojev/ValidationError {
+	public final fun getLocation ()Ljava/util/List;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getType ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
 }
 

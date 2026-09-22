@@ -42,6 +42,32 @@ kotlin {
     }
 }
 
+// Live-API tests: a separate JVM compilation, run by `jvmLiveTest` only when TYPESAFE_API_KEY is
+// set and reported as SKIPPED otherwise (AGENTS.md hard rule 5). This is the only place a concrete
+// Ktor engine is allowed as a dependency.
+val liveTest =
+    kotlin.jvm().compilations.create("liveTest") {
+        associateWith(kotlin.jvm().compilations.getByName("main"))
+        defaultSourceSet.dependencies {
+            implementation(kotlin("test-junit"))
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.cio)
+        }
+    }
+
+tasks.register<Test>("jvmLiveTest") {
+    group = "verification"
+    description = "Runs the live-API tests against the real API; skipped unless TYPESAFE_API_KEY is set."
+    testClassesDirs = liveTest.output.classesDirs
+    classpath = liveTest.output.allOutputs + liveTest.runtimeDependencyFiles
+    useJUnit()
+    onlyIf("TYPESAFE_API_KEY is set") { !System.getenv("TYPESAFE_API_KEY").isNullOrBlank() }
+}
+
+tasks.named("check") {
+    dependsOn("jvmLiveTest")
+}
+
 apiValidation {
     @OptIn(kotlinx.validation.ExperimentalBCVApi::class)
     klib {

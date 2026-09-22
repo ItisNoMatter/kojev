@@ -18,10 +18,12 @@ class DecisionTest {
                     answers = mapOf("is_angry" to NoulAnswerDto(noul = 0.7)),
                     usage = UsageDto(inputTokens = 1, outputTokens = 1),
                 ),
+                requestId = "req-42",
             )
 
         assertEquals(0.7, decision[angryQ])
         assertEquals("jev-1.13.0", decision.model)
+        assertEquals("req-42", decision.requestId)
     }
 
     @Test
@@ -34,6 +36,7 @@ class DecisionTest {
                     answers = emptyMap(),
                     usage = UsageDto(inputTokens = 1, outputTokens = 1),
                 ),
+                requestId = null,
             )
 
         val exception = assertFailsWith<MissingAnswerException> { decision[angryQ] }
