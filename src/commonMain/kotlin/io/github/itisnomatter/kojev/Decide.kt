@@ -57,5 +57,5 @@ suspend fun <S : Any> JevClient.decide(
     }
     val keys = DecisionBuilder().apply(block).keys
     require(keys.isNotEmpty()) { "decide { } must ask at least one question." }
-    return requestDecision(httpClient, baseUrl, model, encoded, keys)
+    return requestDecision(transport, model, encoded, keys)
 }

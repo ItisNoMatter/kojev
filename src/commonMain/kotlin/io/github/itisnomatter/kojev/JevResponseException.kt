@@ -1,13 +1,28 @@
 package io.github.itisnomatter.kojev
 
 /**
- * A response could not be matched against the questions that asked for it. This always means
+ * A 2xx response could not be matched against the questions that asked for it. This always means
  * a server/library contract mismatch (a stale client against a newer API, or a bug) - kojev
  * never turns a missing, mistyped, or out-of-range answer into a default or a null.
  */
 sealed class JevResponseException(
     message: String,
-) : Exception(message)
+    cause: Throwable? = null,
+) : JevException(message, cause)
+
+/** The 2xx response body was not a System One response at all - not JSON, or not the documented shape. */
+class UnreadableResponseException internal constructor(
+    /** The `x-typesafe-request-id` header, if the response carried one. */
+    val requestId: String?,
+    cause: Throwable,
+) : JevResponseException(
+        if (requestId == null) {
+            "The response body is not a System One response."
+        } else {
+            "The response body is not a System One response (request id: $requestId)."
+        },
+        cause,
+    )
 
 /** The response has no answer under the key's name at all. */
 class MissingAnswerException internal constructor(

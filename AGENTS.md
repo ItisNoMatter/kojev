@@ -91,7 +91,10 @@ Transport requirements:
 - Retry on 408 / 429 / 5xx with exponential backoff and jitter, honouring `Retry-After`. Make it configurable.
 - Split errors into subclasses by HTTP status, each carrying the request id
 - `JevClient` is thread-safe: create one per application and share it. `close()` releases the HTTP client it created.
-- Timeouts apply per attempt
+- Timeouts apply per attempt; a total budget bounds the whole decision, and a wait that would
+  exceed it is not taken — the last failure is thrown at once with the server's `retryAfter` on it
+- Everything a decision throws is a `JevException`: `JevApiException` per status, `JevConnectionException`
+  / `JevRequestTimeoutException` for no response, `JevResponseException` for a 2xx that doesn't match the questions
 
 ---
 
@@ -152,6 +155,16 @@ val likely: Urgency = urgency.mostLikely              // the mode of the distrib
 val levels: Map<Urgency, Double> = urgency.probabilities
 
 val tokens: Int = result.usage.inputTokens            // every response carries usage
+val id: String? = result.requestId                    // for support requests
+
+// Everything a decision throws is a JevException; catch narrower where you can act narrower.
+try {
+    jev.decide(ticket) { ask(intentQ) }
+} catch (e: JevRateLimitException) {
+    e.retryAfter                                      // the server's requested wait, if any
+} catch (e: JevApiException) {
+    e.status; e.requestId
+}
 ```
 
 Notes:
@@ -189,6 +202,12 @@ That is Jev's primary use, so asking several questions at once must be the natur
 - The library is `kojev` (Maven: `io.github.itisnomatter:kojev`)
 - Identifiers in code need not echo it. `JevClient` and `jev.decide { }` are fine —
   the same way Koin exposes `startKoin` and Ktor exposes `HttpClient`.
+- **A public name that could plausibly exist in another library gets a `Jev` prefix; a name that
+  is a Jev-specific concept does not.** Transport-level exceptions are generic
+  (`JevBadRequestException`, `JevNotFoundException` — both exist in Ktor server;
+  `JevRateLimitException`, `JevRequestTimeoutException`), so they are prefixed. Response-shape
+  exceptions are Jev concepts (`MissingAnswerException`, `UnknownChoiceLabelException`), so they
+  are not. kojev's audience is server-side Kotlin, where an import clash is a real cost.
 
 ---
 

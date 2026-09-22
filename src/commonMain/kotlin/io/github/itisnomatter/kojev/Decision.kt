@@ -9,6 +9,8 @@ import io.github.itisnomatter.kojev.wire.SystemOneResponseDto
  */
 class Decision internal constructor(
     private val response: SystemOneResponseDto,
+    /** The `x-typesafe-request-id` header of the response, for support requests; absent if it carried none. */
+    val requestId: String?,
 ) {
     /** The versioned model id that actually answered - may differ from an alias in the request. */
     val model: String = response.model

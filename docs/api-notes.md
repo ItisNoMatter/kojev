@@ -245,6 +245,20 @@ Both official SDKs read the request id from an `x-typesafe-request-id` response 
 response, error or success, and surface it on thrown errors [S10][S11]. There is no request id
 field inside the JSON error body itself — it is header-only.
 
+**Observed, not documented** (one live `401` on 2026-09-22 with an invalid key, via `curl`):
+
+```
+HTTP/1.1 401 Unauthorized
+content-type: application/json
+x-typesafe-request-id: req_01a0c710a5dc7f06a2d40f76c0f18f01
+
+{"detail":{"error_type":"authentication_error","message":"Cannot authenticate with the server. Please check your API key and try again."}}
+```
+
+So at least `401` uses the `detail.message` shape from the list above, the request id looks like
+`req_` + 32 hex characters, and there is an `error_type` field that neither the docs nor the SDKs
+mention. One observation of one status; do not build on `error_type` until it is documented.
+
 **This is a gap worth flagging explicitly in the discrepancy section below**, not a place to
 invent a schema.
 
@@ -271,13 +285,19 @@ Do not hardcode a limit; only react to `429` and `Retry-After`.
     headers: `Retry-After` (seconds, or an HTTP date) and a TypeSafe-specific `Retry-After-Ms`
     (milliseconds) [S10]
   - Default total retry budget: **30 seconds** across the whole call, including the initial
-    attempt (Python SDK; stops before a retry that would exceed the budget) [S10]
+    attempt (Python SDK; stops before a retry that would exceed the budget) [S10]. The JS SDK
+    has **no** total budget; its per-call `timeout` is the only outer bound [S11]
+  - The JS SDK ignores a server-supplied delay longer than **60 seconds** (`maxRetryAfterMs:
+    60_000`) and falls back to its computed backoff instead [S11]; the Python SDK has no such cap
   - Connection errors and timeouts are retried by default in addition to the status-code list
-    [S10]
+    [S10][S11]
+  - Both SDKs send `X-TypeSafe-Retry-Count: <n>` on every retry (n = 1 for the first retry),
+    and not on the initial attempt [S10][S11]
 
-None of the specific numbers above (2 retries, 0.5s/5.0s/25% backoff, 30s budget) are stated in
-the prose documentation — they come only from reading both SDKs' source, where they agree with
-each other. Treat them as "the de facto official default", not as a documented contract.
+None of the specific numbers above (2 retries, 0.5s/5.0s/25% backoff, 30s budget, 60s cap) are
+stated in the prose documentation — they come only from reading both SDKs' source. Where the two
+agree, treat it as "the de facto official default"; where they differ (budget, cap), a client has
+to choose. Neither is a documented contract.
 
 ## Model aliases
 

@@ -38,6 +38,8 @@ final class <#A: kotlin/Any?> io.github.itisnomatter.kojev/ScoreAnswer { // io.g
 final class io.github.itisnomatter.kojev/Decision { // io.github.itisnomatter.kojev/Decision|null[0]
     final val model // io.github.itisnomatter.kojev/Decision.model|{}model[0]
         final fun <get-model>(): kotlin/String // io.github.itisnomatter.kojev/Decision.model.<get-model>|<get-model>(){}[0]
+    final val requestId // io.github.itisnomatter.kojev/Decision.requestId|{}requestId[0]
+        final fun <get-requestId>(): kotlin/String? // io.github.itisnomatter.kojev/Decision.requestId.<get-requestId>|<get-requestId>(){}[0]
     final val usage // io.github.itisnomatter.kojev/Decision.usage|{}usage[0]
         final fun <get-usage>(): io.github.itisnomatter.kojev/Usage // io.github.itisnomatter.kojev/Decision.usage.<get-usage>|<get-usage>(){}[0]
 
@@ -47,6 +49,10 @@ final class io.github.itisnomatter.kojev/Decision { // io.github.itisnomatter.ko
 final class io.github.itisnomatter.kojev/DecisionBuilder { // io.github.itisnomatter.kojev/DecisionBuilder|null[0]
     final fun ask(kotlin/Array<out io.github.itisnomatter.kojev/QuestionKey<*>>...) // io.github.itisnomatter.kojev/DecisionBuilder.ask|ask(kotlin.Array<out|io.github.itisnomatter.kojev.QuestionKey<*>>...){}[0]
 }
+
+final class io.github.itisnomatter.kojev/JevAuthenticationException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevAuthenticationException|null[0]
+
+final class io.github.itisnomatter.kojev/JevBadRequestException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevBadRequestException|null[0]
 
 final class io.github.itisnomatter.kojev/JevClient : kotlin/AutoCloseable { // io.github.itisnomatter.kojev/JevClient|null[0]
     final val baseUrl // io.github.itisnomatter.kojev/JevClient.baseUrl|{}baseUrl[0]
@@ -69,7 +75,31 @@ final class io.github.itisnomatter.kojev/JevClientConfig { // io.github.itisnoma
     final var timeout // io.github.itisnomatter.kojev/JevClientConfig.timeout|{}timeout[0]
         final fun <get-timeout>(): kotlin.time/Duration // io.github.itisnomatter.kojev/JevClientConfig.timeout.<get-timeout>|<get-timeout>(){}[0]
         final fun <set-timeout>(kotlin.time/Duration) // io.github.itisnomatter.kojev/JevClientConfig.timeout.<set-timeout>|<set-timeout>(kotlin.time.Duration){}[0]
+
+    final fun retry(kotlin/Function1<io.github.itisnomatter.kojev/RetryPolicy, kotlin/Unit>) // io.github.itisnomatter.kojev/JevClientConfig.retry|retry(kotlin.Function1<io.github.itisnomatter.kojev.RetryPolicy,kotlin.Unit>){}[0]
 }
+
+final class io.github.itisnomatter.kojev/JevConnectionException : io.github.itisnomatter.kojev/JevException // io.github.itisnomatter.kojev/JevConnectionException|null[0]
+
+final class io.github.itisnomatter.kojev/JevNotFoundException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevNotFoundException|null[0]
+
+final class io.github.itisnomatter.kojev/JevPermissionDeniedException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevPermissionDeniedException|null[0]
+
+final class io.github.itisnomatter.kojev/JevRateLimitException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevRateLimitException|null[0]
+
+final class io.github.itisnomatter.kojev/JevRequestTimeoutException : io.github.itisnomatter.kojev/JevException { // io.github.itisnomatter.kojev/JevRequestTimeoutException|null[0]
+    final val timeout // io.github.itisnomatter.kojev/JevRequestTimeoutException.timeout|{}timeout[0]
+        final fun <get-timeout>(): kotlin.time/Duration // io.github.itisnomatter.kojev/JevRequestTimeoutException.timeout.<get-timeout>|<get-timeout>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/JevRequestValidationException : io.github.itisnomatter.kojev/JevApiException { // io.github.itisnomatter.kojev/JevRequestValidationException|null[0]
+    final val errors // io.github.itisnomatter.kojev/JevRequestValidationException.errors|{}errors[0]
+        final fun <get-errors>(): kotlin.collections/List<io.github.itisnomatter.kojev/ValidationError> // io.github.itisnomatter.kojev/JevRequestValidationException.errors.<get-errors>|<get-errors>(){}[0]
+}
+
+final class io.github.itisnomatter.kojev/JevServerException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevServerException|null[0]
+
+final class io.github.itisnomatter.kojev/JevUnexpectedStatusException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevUnexpectedStatusException|null[0]
 
 final class io.github.itisnomatter.kojev/MalformedAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MalformedAnswerException|null[0]
     final val detail // io.github.itisnomatter.kojev/MalformedAnswerException.detail|{}detail[0]
@@ -92,6 +122,39 @@ final class io.github.itisnomatter.kojev/NoulCriteria { // io.github.itisnomatte
         final fun <set-whenTrue>(kotlin/String?) // io.github.itisnomatter.kojev/NoulCriteria.whenTrue.<set-whenTrue>|<set-whenTrue>(kotlin.String?){}[0]
 }
 
+final class io.github.itisnomatter.kojev/RetryPolicy { // io.github.itisnomatter.kojev/RetryPolicy|null[0]
+    final var initialBackoff // io.github.itisnomatter.kojev/RetryPolicy.initialBackoff|{}initialBackoff[0]
+        final fun <get-initialBackoff>(): kotlin.time/Duration // io.github.itisnomatter.kojev/RetryPolicy.initialBackoff.<get-initialBackoff>|<get-initialBackoff>(){}[0]
+        final fun <set-initialBackoff>(kotlin.time/Duration) // io.github.itisnomatter.kojev/RetryPolicy.initialBackoff.<set-initialBackoff>|<set-initialBackoff>(kotlin.time.Duration){}[0]
+    final var jitter // io.github.itisnomatter.kojev/RetryPolicy.jitter|{}jitter[0]
+        final fun <get-jitter>(): kotlin/Double // io.github.itisnomatter.kojev/RetryPolicy.jitter.<get-jitter>|<get-jitter>(){}[0]
+        final fun <set-jitter>(kotlin/Double) // io.github.itisnomatter.kojev/RetryPolicy.jitter.<set-jitter>|<set-jitter>(kotlin.Double){}[0]
+    final var maxBackoff // io.github.itisnomatter.kojev/RetryPolicy.maxBackoff|{}maxBackoff[0]
+        final fun <get-maxBackoff>(): kotlin.time/Duration // io.github.itisnomatter.kojev/RetryPolicy.maxBackoff.<get-maxBackoff>|<get-maxBackoff>(){}[0]
+        final fun <set-maxBackoff>(kotlin.time/Duration) // io.github.itisnomatter.kojev/RetryPolicy.maxBackoff.<set-maxBackoff>|<set-maxBackoff>(kotlin.time.Duration){}[0]
+    final var maxRetries // io.github.itisnomatter.kojev/RetryPolicy.maxRetries|{}maxRetries[0]
+        final fun <get-maxRetries>(): kotlin/Int // io.github.itisnomatter.kojev/RetryPolicy.maxRetries.<get-maxRetries>|<get-maxRetries>(){}[0]
+        final fun <set-maxRetries>(kotlin/Int) // io.github.itisnomatter.kojev/RetryPolicy.maxRetries.<set-maxRetries>|<set-maxRetries>(kotlin.Int){}[0]
+    final var maxRetryAfter // io.github.itisnomatter.kojev/RetryPolicy.maxRetryAfter|{}maxRetryAfter[0]
+        final fun <get-maxRetryAfter>(): kotlin.time/Duration // io.github.itisnomatter.kojev/RetryPolicy.maxRetryAfter.<get-maxRetryAfter>|<get-maxRetryAfter>(){}[0]
+        final fun <set-maxRetryAfter>(kotlin.time/Duration) // io.github.itisnomatter.kojev/RetryPolicy.maxRetryAfter.<set-maxRetryAfter>|<set-maxRetryAfter>(kotlin.time.Duration){}[0]
+    final var respectRetryAfter // io.github.itisnomatter.kojev/RetryPolicy.respectRetryAfter|{}respectRetryAfter[0]
+        final fun <get-respectRetryAfter>(): kotlin/Boolean // io.github.itisnomatter.kojev/RetryPolicy.respectRetryAfter.<get-respectRetryAfter>|<get-respectRetryAfter>(){}[0]
+        final fun <set-respectRetryAfter>(kotlin/Boolean) // io.github.itisnomatter.kojev/RetryPolicy.respectRetryAfter.<set-respectRetryAfter>|<set-respectRetryAfter>(kotlin.Boolean){}[0]
+    final var retryOnConnectionError // io.github.itisnomatter.kojev/RetryPolicy.retryOnConnectionError|{}retryOnConnectionError[0]
+        final fun <get-retryOnConnectionError>(): kotlin/Boolean // io.github.itisnomatter.kojev/RetryPolicy.retryOnConnectionError.<get-retryOnConnectionError>|<get-retryOnConnectionError>(){}[0]
+        final fun <set-retryOnConnectionError>(kotlin/Boolean) // io.github.itisnomatter.kojev/RetryPolicy.retryOnConnectionError.<set-retryOnConnectionError>|<set-retryOnConnectionError>(kotlin.Boolean){}[0]
+    final var retryOnStatuses // io.github.itisnomatter.kojev/RetryPolicy.retryOnStatuses|{}retryOnStatuses[0]
+        final fun <get-retryOnStatuses>(): kotlin.collections/Set<kotlin/Int> // io.github.itisnomatter.kojev/RetryPolicy.retryOnStatuses.<get-retryOnStatuses>|<get-retryOnStatuses>(){}[0]
+        final fun <set-retryOnStatuses>(kotlin.collections/Set<kotlin/Int>) // io.github.itisnomatter.kojev/RetryPolicy.retryOnStatuses.<set-retryOnStatuses>|<set-retryOnStatuses>(kotlin.collections.Set<kotlin.Int>){}[0]
+    final var retryOnTimeout // io.github.itisnomatter.kojev/RetryPolicy.retryOnTimeout|{}retryOnTimeout[0]
+        final fun <get-retryOnTimeout>(): kotlin/Boolean // io.github.itisnomatter.kojev/RetryPolicy.retryOnTimeout.<get-retryOnTimeout>|<get-retryOnTimeout>(){}[0]
+        final fun <set-retryOnTimeout>(kotlin/Boolean) // io.github.itisnomatter.kojev/RetryPolicy.retryOnTimeout.<set-retryOnTimeout>|<set-retryOnTimeout>(kotlin.Boolean){}[0]
+    final var totalBudget // io.github.itisnomatter.kojev/RetryPolicy.totalBudget|{}totalBudget[0]
+        final fun <get-totalBudget>(): kotlin.time/Duration? // io.github.itisnomatter.kojev/RetryPolicy.totalBudget.<get-totalBudget>|<get-totalBudget>(){}[0]
+        final fun <set-totalBudget>(kotlin.time/Duration?) // io.github.itisnomatter.kojev/RetryPolicy.totalBudget.<set-totalBudget>|<set-totalBudget>(kotlin.time.Duration?){}[0]
+}
+
 final class io.github.itisnomatter.kojev/UnexpectedAnswerTypeException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException|null[0]
     final val actual // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.actual|{}actual[0]
         final fun <get-actual>(): kotlin/String // io.github.itisnomatter.kojev/UnexpectedAnswerTypeException.actual.<get-actual>|<get-actual>(){}[0]
@@ -108,6 +171,11 @@ final class io.github.itisnomatter.kojev/UnknownChoiceLabelException : io.github
         final fun <get-label>(): kotlin/String // io.github.itisnomatter.kojev/UnknownChoiceLabelException.label.<get-label>|<get-label>(){}[0]
 }
 
+final class io.github.itisnomatter.kojev/UnreadableResponseException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnreadableResponseException|null[0]
+    final val requestId // io.github.itisnomatter.kojev/UnreadableResponseException.requestId|{}requestId[0]
+        final fun <get-requestId>(): kotlin/String? // io.github.itisnomatter.kojev/UnreadableResponseException.requestId.<get-requestId>|<get-requestId>(){}[0]
+}
+
 final class io.github.itisnomatter.kojev/Usage { // io.github.itisnomatter.kojev/Usage|null[0]
     final val inputTokens // io.github.itisnomatter.kojev/Usage.inputTokens|{}inputTokens[0]
         final fun <get-inputTokens>(): kotlin/Int // io.github.itisnomatter.kojev/Usage.inputTokens.<get-inputTokens>|<get-inputTokens>(){}[0]
@@ -115,12 +183,36 @@ final class io.github.itisnomatter.kojev/Usage { // io.github.itisnomatter.kojev
         final fun <get-outputTokens>(): kotlin/Int // io.github.itisnomatter.kojev/Usage.outputTokens.<get-outputTokens>|<get-outputTokens>(){}[0]
 }
 
+final class io.github.itisnomatter.kojev/ValidationError { // io.github.itisnomatter.kojev/ValidationError|null[0]
+    final val location // io.github.itisnomatter.kojev/ValidationError.location|{}location[0]
+        final fun <get-location>(): kotlin.collections/List<kotlin/String> // io.github.itisnomatter.kojev/ValidationError.location.<get-location>|<get-location>(){}[0]
+    final val message // io.github.itisnomatter.kojev/ValidationError.message|{}message[0]
+        final fun <get-message>(): kotlin/String // io.github.itisnomatter.kojev/ValidationError.message.<get-message>|<get-message>(){}[0]
+    final val type // io.github.itisnomatter.kojev/ValidationError.type|{}type[0]
+        final fun <get-type>(): kotlin/String // io.github.itisnomatter.kojev/ValidationError.type.<get-type>|<get-type>(){}[0]
+
+    final fun toString(): kotlin/String // io.github.itisnomatter.kojev/ValidationError.toString|toString(){}[0]
+}
+
 sealed class <#A: out kotlin/Any?> io.github.itisnomatter.kojev/QuestionKey { // io.github.itisnomatter.kojev/QuestionKey|null[0]
     abstract val name // io.github.itisnomatter.kojev/QuestionKey.name|{}name[0]
         abstract fun <get-name>(): kotlin/String // io.github.itisnomatter.kojev/QuestionKey.name.<get-name>|<get-name>(){}[0]
 }
 
-sealed class io.github.itisnomatter.kojev/JevResponseException : kotlin/Exception // io.github.itisnomatter.kojev/JevResponseException|null[0]
+sealed class io.github.itisnomatter.kojev/JevApiException : io.github.itisnomatter.kojev/JevException { // io.github.itisnomatter.kojev/JevApiException|null[0]
+    final val body // io.github.itisnomatter.kojev/JevApiException.body|{}body[0]
+        final fun <get-body>(): kotlin/String? // io.github.itisnomatter.kojev/JevApiException.body.<get-body>|<get-body>(){}[0]
+    final val requestId // io.github.itisnomatter.kojev/JevApiException.requestId|{}requestId[0]
+        final fun <get-requestId>(): kotlin/String? // io.github.itisnomatter.kojev/JevApiException.requestId.<get-requestId>|<get-requestId>(){}[0]
+    final val retryAfter // io.github.itisnomatter.kojev/JevApiException.retryAfter|{}retryAfter[0]
+        final fun <get-retryAfter>(): kotlin.time/Duration? // io.github.itisnomatter.kojev/JevApiException.retryAfter.<get-retryAfter>|<get-retryAfter>(){}[0]
+    final val status // io.github.itisnomatter.kojev/JevApiException.status|{}status[0]
+        final fun <get-status>(): kotlin/Int // io.github.itisnomatter.kojev/JevApiException.status.<get-status>|<get-status>(){}[0]
+}
+
+sealed class io.github.itisnomatter.kojev/JevException : kotlin/Exception // io.github.itisnomatter.kojev/JevException|null[0]
+
+sealed class io.github.itisnomatter.kojev/JevResponseException : io.github.itisnomatter.kojev/JevException // io.github.itisnomatter.kojev/JevResponseException|null[0]
 
 final fun <#A: io.github.itisnomatter.kojev/Criterion & kotlin/Enum<#A>> io.github.itisnomatter.kojev/choiceOfEntries(kotlin/String, kotlin/String, kotlin.collections/List<#A>): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ChoiceAnswer<#A>> // io.github.itisnomatter.kojev/choiceOfEntries|choiceOfEntries(kotlin.String;kotlin.String;kotlin.collections.List<0:0>){0§<kotlin.Enum<0:0>&io.github.itisnomatter.kojev.Criterion>}[0]
 final fun <#A: io.github.itisnomatter.kojev/Criterion & kotlin/Enum<#A>> io.github.itisnomatter.kojev/scoreOfEntries(kotlin/String, kotlin/String, kotlin.collections/List<#A>): io.github.itisnomatter.kojev/QuestionKey<io.github.itisnomatter.kojev/ScoreAnswer<#A>> // io.github.itisnomatter.kojev/scoreOfEntries|scoreOfEntries(kotlin.String;kotlin.String;kotlin.collections.List<0:0>){0§<kotlin.Enum<0:0>&io.github.itisnomatter.kojev.Criterion>}[0]

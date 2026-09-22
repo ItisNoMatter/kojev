@@ -2,7 +2,6 @@ package io.github.itisnomatter.kojev
 
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.HttpRequestData
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -60,7 +59,15 @@ class JevClientTest {
         val engine =
             MockEngine { request ->
                 requests += request
-                respond(content = body, status = status, headers = headersOf(HttpHeaders.ContentType, "application/json"))
+                respond(
+                    content = body,
+                    status = status,
+                    headers =
+                        headersOf(
+                            HttpHeaders.ContentType to listOf("application/json"),
+                            "x-typesafe-request-id" to listOf("req-abc"),
+                        ),
+                )
             }
         return JevClient(apiKey = "test-key", engine = engine, configure = configure)
     }
@@ -126,6 +133,7 @@ class JevClientTest {
             assertEquals(Urgency.NOW, result[urgencyQ].mostLikely)
             assertEquals(0.8, result[urgencyQ].score)
             assertEquals("jev-1.13.0", result.model)
+            assertEquals("req-abc", result.requestId)
             assertEquals(120, result.usage.inputTokens)
             assertEquals(12, result.usage.outputTokens)
         }
@@ -187,11 +195,29 @@ class JevClientTest {
         }
 
     @Test
-    fun `a non-2xx response is not swallowed`() =
+    fun `a non-2xx response is a JevApiException for its status`() =
         runTest {
             val jev = client(mutableListOf(), status = HttpStatusCode.Unauthorized, body = """{"message":"bad key"}""")
-            assertFailsWith<ClientRequestException> { jev.decide("x") { ask(noul("q", "...")) } }
+            val e = assertFailsWith<JevAuthenticationException> { jev.decide("x") { ask(noul("q", "...")) } }
+            assertEquals(401, e.status)
+            assertEquals("req-abc", e.requestId)
+            assertEquals("401 bad key (request id: req-abc)", e.message)
         }
+
+    @Test
+    fun `retry settings are applied`() =
+        runTest {
+            val requests = mutableListOf<HttpRequestData>()
+            val jev = client(requests, status = HttpStatusCode.ServiceUnavailable, body = "{}") { retry { maxRetries = 4 } }
+            assertFailsWith<JevServerException> { jev.decide("x") { ask(noul("q", "...")) } }
+            assertEquals(5, requests.size)
+        }
+
+    @Test
+    fun `invalid retry settings are rejected when the client is built`() {
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { maxRetries = -1 } } }
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { jitter = 1.5 } } }
+    }
 
     @Test
     fun `close releases the http client`() =

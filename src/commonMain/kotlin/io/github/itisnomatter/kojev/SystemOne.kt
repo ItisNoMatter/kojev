@@ -2,8 +2,7 @@ package io.github.itisnomatter.kojev
 
 import io.github.itisnomatter.kojev.wire.QuestionDto
 import io.github.itisnomatter.kojev.wire.SystemOneRequestDto
-import io.github.itisnomatter.kojev.wire.callSystemOne
-import io.ktor.client.HttpClient
+import io.github.itisnomatter.kojev.wire.Transport
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -28,13 +27,12 @@ internal fun buildRequest(
  * Sends [keys] as one request against [state] and returns their typed answers.
  */
 internal suspend fun requestDecision(
-    httpClient: HttpClient,
-    baseUrl: String,
+    transport: Transport,
     model: String,
     state: JsonElement,
     keys: List<QuestionKey<*>>,
 ): Decision {
     val request = buildRequest(model, state, keys)
-    val response = callSystemOne(httpClient, baseUrl, request)
-    return Decision(response)
+    val result = transport.systemOne(request)
+    return Decision(result.response, result.requestId)
 }
