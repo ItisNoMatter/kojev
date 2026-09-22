@@ -382,6 +382,20 @@ class TransportTest {
         }
 
     @Test
+    fun `less than a millisecond of budget left after a wait throws the failure instead of attempting`() =
+        runTest {
+            val clock = TestTimeSource()
+            val timeouts = mutableListOf<Long>()
+            // 10 s attempt + 0.5 s wait = 10.5 s; the budget leaves 0.4 ms after that - below Ktor's 1 ms
+            // resolution, which would otherwise become requestTimeoutMillis = 0 and a spurious
+            // JevConnectionException.
+            val transport = timingOutTransport(clock, timeouts) { totalBudget = 10.seconds + 500.milliseconds + 0.4.milliseconds }
+            val e = assertFailsWith<JevRequestTimeoutException> { transport.systemOne(request) }
+            assertEquals(listOf(10_000L), timeouts)
+            assertEquals(10.seconds, e.timeout)
+        }
+
+    @Test
     fun `without a budget every attempt gets the full timeout`() =
         runTest {
             val clock = TestTimeSource()

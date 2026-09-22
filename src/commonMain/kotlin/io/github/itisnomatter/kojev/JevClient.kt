@@ -1,5 +1,6 @@
 package io.github.itisnomatter.kojev
 
+import io.github.itisnomatter.kojev.wire.MIN_TIMEOUT
 import io.github.itisnomatter.kojev.wire.Transport
 import io.github.itisnomatter.kojev.wire.jevJson
 import io.ktor.client.HttpClient
@@ -60,7 +61,7 @@ fun JevClient(
     val config = JevClientConfig().apply(configure)
     require(config.baseUrl.isNotBlank()) { "baseUrl must not be blank." }
     require(config.model.isNotBlank()) { "model must not be blank." }
-    require(config.timeout.isPositive()) { "timeout must be positive, got ${config.timeout}." }
+    require(config.timeout >= MIN_TIMEOUT) { "timeout must be at least $MIN_TIMEOUT, got ${config.timeout}." }
     val retry = config.retry.snapshot()
     val httpClient =
         HttpClient(engine) {

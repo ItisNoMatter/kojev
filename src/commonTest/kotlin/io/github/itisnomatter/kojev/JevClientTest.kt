@@ -14,6 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /** The client and `decide`, end to end through a mocked transport. */
@@ -217,6 +218,18 @@ class JevClientTest {
     fun `invalid retry settings are rejected when the client is built`() {
         assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { maxRetries = -1 } } }
         assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { jitter = 1.5 } } }
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { totalBudget = 0.seconds } } }
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { totalBudget = (-1).seconds } } }
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { totalBudget = 0.5.milliseconds } } }
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { retry { initialBackoff = (-1).seconds } } }
+    }
+
+    @Test
+    fun `timeout and budget must be at least a millisecond`() {
+        assertFailsWith<IllegalArgumentException> { client(mutableListOf()) { timeout = 0.5.milliseconds } }
+        client(mutableListOf()) { timeout = 1.milliseconds }
+        client(mutableListOf()) { retry { totalBudget = 1.milliseconds } }
+        client(mutableListOf()) { retry { totalBudget = null } }
     }
 
     @Test

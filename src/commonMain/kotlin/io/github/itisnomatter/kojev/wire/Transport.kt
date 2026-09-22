@@ -38,6 +38,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
+/** Ktor's timeout resolution: anything shorter rounds to zero milliseconds, which it rejects. */
+internal val MIN_TIMEOUT: Duration = 1.milliseconds
+
 internal const val REQUEST_ID_HEADER = "x-typesafe-request-id"
 internal const val RETRY_COUNT_HEADER = "X-TypeSafe-Retry-Count"
 private const val RETRY_AFTER_MS_HEADER = "retry-after-ms"
@@ -66,17 +69,18 @@ internal class Transport(
 ) {
     /**
      * The budget bounds the whole call, not only the waits: a wait that would reach it is not
-     * taken, and an attempt's timeout is shortened to whatever remains of it.
+     * taken, and an attempt's timeout is shortened to whatever remains of it. An attempt is only
+     * started with at least [MIN_TIMEOUT] left, Ktor's timeout resolution; with less, the failure
+     * that led here is thrown instead of a meaningless sub-millisecond attempt.
      */
     suspend fun systemOne(request: SystemOneRequestDto): SystemOneResult {
         val started = timeSource.markNow()
         val budget = retry.totalBudget
         var attempt = 0
-        var lastFailure: JevException? = null
+        // Both are validated to be at least MIN_TIMEOUT when the client is built, so the first
+        // attempt always has a usable timeout.
+        var attemptTimeout = if (budget != null && budget < timeout) budget else timeout
         while (true) {
-            val remaining = budget?.let { it - started.elapsedNow() }
-            if (remaining != null && remaining <= Duration.ZERO) throw checkNotNull(lastFailure)
-            val attemptTimeout = if (remaining != null && remaining < timeout) remaining else timeout
             val failure =
                 try {
                     return attemptOnce(request, attempt, attemptTimeout)
@@ -88,9 +92,13 @@ internal class Transport(
             if (attempt >= retry.maxRetries || !isRetryable(failure)) throw failure
             val wait = waitBefore(retryNumber = attempt + 1, failure)
             if (budget != null && started.elapsedNow() + wait >= budget) throw failure
-            lastFailure = failure
             sleep(wait)
             attempt++
+            if (budget != null) {
+                val remaining = budget - started.elapsedNow()
+                if (remaining < MIN_TIMEOUT) throw failure
+                attemptTimeout = if (remaining < timeout) remaining else timeout
+            }
         }
     }
 

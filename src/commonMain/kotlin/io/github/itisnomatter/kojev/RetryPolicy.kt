@@ -1,5 +1,6 @@
 package io.github.itisnomatter.kojev
 
+import io.github.itisnomatter.kojev.wire.MIN_TIMEOUT
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -61,8 +62,9 @@ class RetryPolicy internal constructor() {
 
     /**
      * The most time one decision may take across all attempts and waits, measured from the start
-     * of the first attempt. `null` removes the limit. A wait that would reach it is not taken,
-     * and an attempt's timeout is shortened to what remains of it; see the class documentation.
+     * of the first attempt. `null` removes the limit; otherwise at least one millisecond. A wait
+     * that would reach it is not taken, and an attempt's timeout is shortened to what remains of
+     * it; see the class documentation.
      */
     var totalBudget: Duration? = 30.seconds
 
@@ -72,7 +74,7 @@ class RetryPolicy internal constructor() {
         require(!maxBackoff.isNegative()) { "retry.maxBackoff must not be negative, got $maxBackoff." }
         require(jitter in 0.0..1.0) { "retry.jitter must be between 0 and 1, got $jitter." }
         require(!maxRetryAfter.isNegative()) { "retry.maxRetryAfter must not be negative, got $maxRetryAfter." }
-        totalBudget?.let { require(it.isPositive()) { "retry.totalBudget must be positive or null, got $it." } }
+        totalBudget?.let { require(it >= MIN_TIMEOUT) { "retry.totalBudget must be at least $MIN_TIMEOUT or null, got $it." } }
         return RetrySettings(
             maxRetries = maxRetries,
             initialBackoff = initialBackoff,
