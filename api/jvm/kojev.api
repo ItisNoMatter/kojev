@@ -99,6 +99,10 @@ public final class io/github/itisnomatter/kojev/JevServerException : io/github/i
 public final class io/github/itisnomatter/kojev/JevUnexpectedStatusException : io/github/itisnomatter/kojev/JevApiException {
 }
 
+public final class io/github/itisnomatter/kojev/JevUnreadableResponseException : io/github/itisnomatter/kojev/JevResponseException {
+	public final fun getRequestId ()Ljava/lang/String;
+}
+
 public final class io/github/itisnomatter/kojev/MalformedAnswerException : io/github/itisnomatter/kojev/JevResponseException {
 	public final fun getDetail ()Ljava/lang/String;
 	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
@@ -166,10 +170,6 @@ public final class io/github/itisnomatter/kojev/UnexpectedAnswerTypeException : 
 public final class io/github/itisnomatter/kojev/UnknownChoiceLabelException : io/github/itisnomatter/kojev/JevResponseException {
 	public final fun getKey ()Lio/github/itisnomatter/kojev/QuestionKey;
 	public final fun getLabel ()Ljava/lang/String;
-}
-
-public final class io/github/itisnomatter/kojev/UnreadableResponseException : io/github/itisnomatter/kojev/JevResponseException {
-	public final fun getRequestId ()Ljava/lang/String;
 }
 
 public final class io/github/itisnomatter/kojev/Usage {

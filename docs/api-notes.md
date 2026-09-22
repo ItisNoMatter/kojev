@@ -287,6 +287,13 @@ Do not hardcode a limit; only react to `429` and `Retry-After`.
   - Default total retry budget: **30 seconds** across the whole call, including the initial
     attempt (Python SDK; stops before a retry that would exceed the budget) [S10]. The JS SDK
     has **no** total budget; its per-call `timeout` is the only outer bound [S11]
+  - **What the Python budget actually bounds:** it is tenacity's `stop_before_delay`, which stops
+    "right before the next attempt would take place" when `seconds_since_start + upcoming_sleep
+    >= limit` (tenacity 9.1.4, `stop.py`). It never shortens an attempt in flight, so with the
+    defaults (10 s per attempt, 2 retries, 0.5 s / 1 s backoff) two timeouts let a third attempt
+    start at ~21.5 s and run until ~31.5 s - past the 30 s "budget". The budget bounds the
+    *waits*, not the call [S10]. kojev deliberately differs: its `totalBudget` also shortens the
+    last attempt's timeout to what remains, so the call itself never exceeds it
   - The JS SDK ignores a server-supplied delay longer than **60 seconds** (`maxRetryAfterMs:
     60_000`) and falls back to its computed backoff instead [S11]; the Python SDK has no such cap
   - Connection errors and timeouts are retried by default in addition to the status-code list

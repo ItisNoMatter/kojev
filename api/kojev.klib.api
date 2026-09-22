@@ -101,6 +101,11 @@ final class io.github.itisnomatter.kojev/JevServerException : io.github.itisnoma
 
 final class io.github.itisnomatter.kojev/JevUnexpectedStatusException : io.github.itisnomatter.kojev/JevApiException // io.github.itisnomatter.kojev/JevUnexpectedStatusException|null[0]
 
+final class io.github.itisnomatter.kojev/JevUnreadableResponseException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/JevUnreadableResponseException|null[0]
+    final val requestId // io.github.itisnomatter.kojev/JevUnreadableResponseException.requestId|{}requestId[0]
+        final fun <get-requestId>(): kotlin/String? // io.github.itisnomatter.kojev/JevUnreadableResponseException.requestId.<get-requestId>|<get-requestId>(){}[0]
+}
+
 final class io.github.itisnomatter.kojev/MalformedAnswerException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/MalformedAnswerException|null[0]
     final val detail // io.github.itisnomatter.kojev/MalformedAnswerException.detail|{}detail[0]
         final fun <get-detail>(): kotlin/String // io.github.itisnomatter.kojev/MalformedAnswerException.detail.<get-detail>|<get-detail>(){}[0]
@@ -169,11 +174,6 @@ final class io.github.itisnomatter.kojev/UnknownChoiceLabelException : io.github
         final fun <get-key>(): io.github.itisnomatter.kojev/QuestionKey<*> // io.github.itisnomatter.kojev/UnknownChoiceLabelException.key.<get-key>|<get-key>(){}[0]
     final val label // io.github.itisnomatter.kojev/UnknownChoiceLabelException.label|{}label[0]
         final fun <get-label>(): kotlin/String // io.github.itisnomatter.kojev/UnknownChoiceLabelException.label.<get-label>|<get-label>(){}[0]
-}
-
-final class io.github.itisnomatter.kojev/UnreadableResponseException : io.github.itisnomatter.kojev/JevResponseException { // io.github.itisnomatter.kojev/UnreadableResponseException|null[0]
-    final val requestId // io.github.itisnomatter.kojev/UnreadableResponseException.requestId|{}requestId[0]
-        final fun <get-requestId>(): kotlin/String? // io.github.itisnomatter.kojev/UnreadableResponseException.requestId.<get-requestId>|<get-requestId>(){}[0]
 }
 
 final class io.github.itisnomatter.kojev/Usage { // io.github.itisnomatter.kojev/Usage|null[0]

@@ -11,7 +11,7 @@ sealed class JevResponseException(
 ) : JevException(message, cause)
 
 /** The 2xx response body was not a System One response at all - not JSON, or not the documented shape. */
-class UnreadableResponseException internal constructor(
+class JevUnreadableResponseException internal constructor(
     /** The `x-typesafe-request-id` header, if the response carried one. */
     val requestId: String?,
     cause: Throwable,

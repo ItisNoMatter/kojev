@@ -91,8 +91,10 @@ Transport requirements:
 - Retry on 408 / 429 / 5xx with exponential backoff and jitter, honouring `Retry-After`. Make it configurable.
 - Split errors into subclasses by HTTP status, each carrying the request id
 - `JevClient` is thread-safe: create one per application and share it. `close()` releases the HTTP client it created.
-- Timeouts apply per attempt; a total budget bounds the whole decision, and a wait that would
-  exceed it is not taken — the last failure is thrown at once with the server's `retryAfter` on it
+- Timeouts apply per attempt; a total budget bounds the whole decision — a wait that would
+  exceed it is not taken (the last failure is thrown at once with the server's `retryAfter` on it),
+  and the last attempt's timeout is shortened to what remains. Unlike the Python SDK's budget,
+  which bounds only the waits (`docs/api-notes.md`)
 - Everything a decision throws is a `JevException`: `JevApiException` per status, `JevConnectionException`
   / `JevRequestTimeoutException` for no response, `JevResponseException` for a 2xx that doesn't match the questions
 
@@ -208,6 +210,10 @@ That is Jev's primary use, so asking several questions at once must be the natur
   `JevRateLimitException`, `JevRequestTimeoutException`), so they are prefixed. Response-shape
   exceptions are Jev concepts (`MissingAnswerException`, `UnknownChoiceLabelException`), so they
   are not. kojev's audience is server-side Kotlin, where an import clash is a real cost.
+  The test is the *name*, not the layer the class lives in: `JevUnreadableResponseException` sits
+  next to `MissingAnswerException`, but "unreadable response" is something any HTTP client could
+  name, so it is prefixed. Ask "could a Ktor, OkHttp, or kotlinx user already have this
+  identifier imported?" — if plausibly yes, prefix.
 
 ---
 

@@ -33,8 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `JevResponseException` (existing) now sits under the same root
 - Retries with `retry { ... }` in the client config: 408 / 429 / 5xx, connection errors, and
   timeouts; exponential backoff with jitter; `retry-after-ms` / `Retry-After` honoured up to a
-  cap; a total budget that is never overrun by waiting - a wait that would exceed it throws the
-  last failure immediately with the server's `retryAfter` on it. Defaults match the official SDKs
+  cap; a total budget that bounds the whole decision - a wait that would exceed it throws the
+  last failure immediately with the server's `retryAfter` on it, and the last attempt's timeout
+  is shortened to what remains. Defaults match the official SDKs
 - `Decision.requestId`
 - A `jvmLiveTest` task that runs against the real API only when `TYPESAFE_API_KEY` is set
 

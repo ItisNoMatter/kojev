@@ -11,14 +11,15 @@ import io.github.itisnomatter.kojev.JevRequestTimeoutException
 import io.github.itisnomatter.kojev.JevRequestValidationException
 import io.github.itisnomatter.kojev.JevServerException
 import io.github.itisnomatter.kojev.JevUnexpectedStatusException
+import io.github.itisnomatter.kojev.JevUnreadableResponseException
 import io.github.itisnomatter.kojev.RetryPolicy
 import io.github.itisnomatter.kojev.RetrySettings
-import io.github.itisnomatter.kojev.UnreadableResponseException
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.HttpTimeoutCapability
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
@@ -40,6 +41,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TestTimeSource
 
 /**
  * The retry loop and the error mapping, through a mocked transport under virtual time: every
@@ -107,11 +109,11 @@ class TransportTest {
         }
 
     @Test
-    fun `a 2xx body that is not a System One response is an UnreadableResponseException`() =
+    fun `a 2xx body that is not a System One response is a JevUnreadableResponseException`() =
         runTest {
             val transport =
                 transport(responses = arrayOf({ reply(HttpStatusCode.OK, """{"unexpected":true}""", REQUEST_ID_HEADER to "req-9") }))
-            val e = assertFailsWith<UnreadableResponseException> { transport.systemOne(request) }
+            val e = assertFailsWith<JevUnreadableResponseException> { transport.systemOne(request) }
             assertEquals("req-9", e.requestId)
         }
 
@@ -324,6 +326,69 @@ class TransportTest {
             // 500 ms wait fits; the next 1000 ms wait would reach 1500 ms > 1200 ms, so it is skipped.
             assertEquals(2, requests.size)
             assertEquals(500, currentTime)
+        }
+
+    /**
+     * Attempts that consume time: a manual clock that the mock's handler advances by the timeout
+     * the request was given, then fails with a timeout. Waits advance the same clock.
+     */
+    private fun timingOutTransport(
+        clock: TestTimeSource,
+        timeouts: MutableList<Long>,
+        configure: RetryPolicy.() -> Unit = {},
+    ): Transport {
+        val engine =
+            MockEngine { request ->
+                val timeoutMillis = checkNotNull(request.getCapabilityOrNull(HttpTimeoutCapability)?.requestTimeoutMillis)
+                timeouts += timeoutMillis
+                clock += timeoutMillis.milliseconds
+                throw HttpRequestTimeoutException(request.url.toString(), timeoutMillis)
+            }
+        val client = HttpClient(engine) { install(ContentNegotiation) { json(jevJson) } }
+        return Transport(
+            httpClient = client,
+            baseUrl = "https://api.typesafe.ai",
+            timeout = 10.seconds,
+            retry = settings(configure),
+            timeSource = clock,
+            random = { 0.0 },
+            sleep = { clock += it },
+        )
+    }
+
+    @Test
+    fun `the last attempt's timeout is shortened to what remains of the budget`() =
+        runTest {
+            val clock = TestTimeSource()
+            val timeouts = mutableListOf<Long>()
+            val transport = timingOutTransport(clock, timeouts)
+            val start = clock.markNow()
+            val e = assertFailsWith<JevRequestTimeoutException> { transport.systemOne(request) }
+            // 10 s, wait 0.5 s, 10 s, wait 1 s: 21.5 s spent, so the third attempt gets 8.5 s, not 10.
+            assertEquals(listOf(10_000L, 10_000L, 8_500L), timeouts)
+            assertEquals(8_500.milliseconds, e.timeout)
+            assertEquals(30.seconds, start.elapsedNow())
+        }
+
+    @Test
+    fun `a budget shorter than the timeout shortens even the first attempt`() =
+        runTest {
+            val clock = TestTimeSource()
+            val timeouts = mutableListOf<Long>()
+            val transport = timingOutTransport(clock, timeouts) { totalBudget = 4.seconds }
+            val e = assertFailsWith<JevRequestTimeoutException> { transport.systemOne(request) }
+            assertEquals(listOf(4_000L), timeouts)
+            assertEquals(4.seconds, e.timeout)
+        }
+
+    @Test
+    fun `without a budget every attempt gets the full timeout`() =
+        runTest {
+            val clock = TestTimeSource()
+            val timeouts = mutableListOf<Long>()
+            val transport = timingOutTransport(clock, timeouts) { totalBudget = null }
+            assertFailsWith<JevRequestTimeoutException> { transport.systemOne(request) }
+            assertEquals(listOf(10_000L, 10_000L, 10_000L), timeouts)
         }
 
     @Test

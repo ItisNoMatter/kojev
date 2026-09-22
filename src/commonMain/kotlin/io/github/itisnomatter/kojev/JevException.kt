@@ -127,7 +127,10 @@ class JevConnectionException internal constructor(
     cause: Throwable,
 ) : JevException("The request could not reach the API: ${cause.message ?: cause::class.simpleName}", cause)
 
-/** One attempt exceeded the client's [timeout]. Timeouts apply per attempt; retries get a fresh one. */
+/**
+ * One attempt exceeded its [timeout]. Timeouts apply per attempt; retries get a fresh one. The
+ * value is the client's timeout, or what remained of the retry budget if that was shorter.
+ */
 class JevRequestTimeoutException internal constructor(
     val timeout: Duration,
     cause: Throwable,

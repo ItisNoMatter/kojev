@@ -21,12 +21,15 @@ import kotlin.time.Duration.Companion.seconds
  * to 25 % subtracted at random; a server-supplied `Retry-After` wins when it is at most 60 s;
  * and a 30 s budget for the whole decision.
  *
- * **The budget is never overrun by waiting.** Before each retry the client computes the wait;
- * if the time already spent plus that wait would reach [totalBudget], it does not wait - it
- * throws the last failure immediately. That failure carries the server's requested delay in
- * [JevApiException.retryAfter], so the caller can decide whether to wait that long. With a 30 s
- * budget and a `Retry-After: 45`, for example, the [JevRateLimitException] is thrown at once with
- * `retryAfter = 45.seconds`.
+ * **The budget bounds the whole decision, waits and attempts alike.** Before each retry the
+ * client computes the wait; if the time already spent plus that wait would reach [totalBudget],
+ * it does not wait - it throws the last failure immediately. That failure carries the server's
+ * requested delay in [JevApiException.retryAfter], so the caller can decide whether to wait that
+ * long. With a 30 s budget and a `Retry-After: 45`, for example, the [JevRateLimitException] is
+ * thrown at once with `retryAfter = 45.seconds`. And an attempt never runs past the budget
+ * either: its timeout is the client's timeout or what remains of the budget, whichever is
+ * shorter, so with the defaults two 10 s timeouts leave the third attempt 8.5 s, not 10.
+ * (The official Python SDK's budget bounds only the waits; see `docs/api-notes.md`.)
  */
 class RetryPolicy internal constructor() {
     /** Retries after the first attempt. `0` disables retrying. */
@@ -58,8 +61,8 @@ class RetryPolicy internal constructor() {
 
     /**
      * The most time one decision may take across all attempts and waits, measured from the start
-     * of the first attempt. `null` removes the limit. See the class documentation for what
-     * happens when the next wait would exceed it.
+     * of the first attempt. `null` removes the limit. A wait that would reach it is not taken,
+     * and an attempt's timeout is shortened to what remains of it; see the class documentation.
      */
     var totalBudget: Duration? = 30.seconds
 

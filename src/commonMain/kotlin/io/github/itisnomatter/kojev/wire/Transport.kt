@@ -12,13 +12,14 @@ import io.github.itisnomatter.kojev.JevRequestTimeoutException
 import io.github.itisnomatter.kojev.JevRequestValidationException
 import io.github.itisnomatter.kojev.JevServerException
 import io.github.itisnomatter.kojev.JevUnexpectedStatusException
+import io.github.itisnomatter.kojev.JevUnreadableResponseException
 import io.github.itisnomatter.kojev.RetrySettings
-import io.github.itisnomatter.kojev.UnreadableResponseException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -63,13 +64,22 @@ internal class Transport(
     private val random: () -> Double = { Random.nextDouble() },
     private val sleep: suspend (Duration) -> Unit = { delay(it) },
 ) {
+    /**
+     * The budget bounds the whole call, not only the waits: a wait that would reach it is not
+     * taken, and an attempt's timeout is shortened to whatever remains of it.
+     */
     suspend fun systemOne(request: SystemOneRequestDto): SystemOneResult {
         val started = timeSource.markNow()
+        val budget = retry.totalBudget
         var attempt = 0
+        var lastFailure: JevException? = null
         while (true) {
+            val remaining = budget?.let { it - started.elapsedNow() }
+            if (remaining != null && remaining <= Duration.ZERO) throw checkNotNull(lastFailure)
+            val attemptTimeout = if (remaining != null && remaining < timeout) remaining else timeout
             val failure =
                 try {
-                    return attemptOnce(request, attempt)
+                    return attemptOnce(request, attempt, attemptTimeout)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: JevException) {
@@ -77,8 +87,8 @@ internal class Transport(
                 }
             if (attempt >= retry.maxRetries || !isRetryable(failure)) throw failure
             val wait = waitBefore(retryNumber = attempt + 1, failure)
-            val budget = retry.totalBudget
             if (budget != null && started.elapsedNow() + wait >= budget) throw failure
+            lastFailure = failure
             sleep(wait)
             attempt++
         }
@@ -87,22 +97,24 @@ internal class Transport(
     private suspend fun attemptOnce(
         request: SystemOneRequestDto,
         attempt: Int,
+        attemptTimeout: Duration,
     ): SystemOneResult {
         val response =
             try {
                 httpClient.post("$baseUrl/v1/systemone") {
                     contentType(ContentType.Application.Json)
                     if (attempt > 0) header(RETRY_COUNT_HEADER, attempt.toString())
+                    timeout { requestTimeoutMillis = attemptTimeout.inWholeMilliseconds }
                     setBody(request)
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: HttpRequestTimeoutException) {
-                throw JevRequestTimeoutException(timeout, e)
+                throw JevRequestTimeoutException(attemptTimeout, e)
             } catch (e: ConnectTimeoutException) {
-                throw JevRequestTimeoutException(timeout, e)
+                throw JevRequestTimeoutException(attemptTimeout, e)
             } catch (e: SocketTimeoutException) {
-                throw JevRequestTimeoutException(timeout, e)
+                throw JevRequestTimeoutException(attemptTimeout, e)
             } catch (e: Throwable) {
                 throw JevConnectionException(e)
             }
@@ -114,7 +126,7 @@ internal class Transport(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                throw UnreadableResponseException(requestId, e)
+                throw JevUnreadableResponseException(requestId, e)
             }
         return SystemOneResult(body, requestId)
     }
