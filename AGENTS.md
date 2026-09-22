@@ -9,11 +9,23 @@ The confirmed Jev API specification lives in `docs/api-notes.md` — read it bef
 
 ## Why this library exists
 
-Answers to Jev questions come back as **the caller's own `enum` / `sealed` types**, not as `String`.
+kojev takes a position on three things, and every design decision is judged against them:
 
-That is the only thing that distinguishes this library. Existing Java and Kotlin clients look up
-answers by string key and cast. An implementation that merely joins that group has no reason to exist.
-**Reject any design decision that erodes this property.**
+1. **Kotlin Multiplatform.** `jvm`, Android, and the iOS targets, so that domain types and the
+   DSL can be shared with app code.
+2. **Answers come back as the caller's own types - for Score as well as Choice.** A Choice is the
+   caller's enum. A Score is a distribution over the caller's enum rubric
+   (`mostLikely: Urgency`, `probabilities: Map<Urgency, Double>`), not a level number plus a legend.
+3. **There is exactly one, typed way to read an answer.** No string-id lookup, no default
+   thresholds, no helper that rounds a Score's mean into a level. This is not a feature that is
+   missing; it follows from hard rules 2 and 3. The judgement calls belong to the caller, and a
+   convenience that makes one on the caller's behalf will be used.
+
+Other Kotlin clients exist and are good at what they choose to be: `pambrose/jev4k` is a JVM
+library with typed choices and many conveniences (string ids, bands, level helpers);
+`ufec/typesafe-sdk-kotlin` is a faithful port of the official JavaScript SDK. kojev is the
+multiplatform, deliberately narrow one. **Reject any design decision that erodes one of the three
+points above** - an implementation that gives them up has no reason to exist next to those libraries.
 
 Non-goals:
 - Wrapping text generation (Jev does not generate)

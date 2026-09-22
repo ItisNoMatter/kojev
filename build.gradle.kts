@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    // Declared here (not applied) so the examples subproject can apply the same Kotlin version.
+    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.binary.compatibility.validator)
@@ -62,6 +64,10 @@ tasks.register<Test>("jvmLiveTest") {
     classpath = liveTest.output.allOutputs + liveTest.runtimeDependencyFiles
     useJUnit()
     onlyIf("TYPESAFE_API_KEY is set") { !System.getenv("TYPESAFE_API_KEY").isNullOrBlank() }
+    // A live test asks whether the real API answers *now*. Gradle would otherwise treat an unchanged
+    // source tree as up-to-date and silently reuse the previous run's result.
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
 }
 
 tasks.named("check") {
@@ -69,6 +75,9 @@ tasks.named("check") {
 }
 
 apiValidation {
+    // Runnable samples, not published API.
+    ignoredProjects.add("examples")
+
     @OptIn(kotlinx.validation.ExperimentalBCVApi::class)
     klib {
         enabled = true

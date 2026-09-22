@@ -12,6 +12,8 @@ plugins {
 
 rootProject.name = "kojev"
 
+include("examples")
+
 dependencyResolutionManagement {
     repositories {
         google()
