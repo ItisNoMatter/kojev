@@ -212,7 +212,8 @@ TYPESAFE_API_KEY=... ./gradlew jvmLiveTest       # against the real API; skipped
 TYPESAFE_API_KEY=... ./gradlew :examples:run     # runnable examples in examples/
 ```
 
-See `CONTRIBUTING.md`. The development history and phases are in `docs/bootstrap.md`.
+See `CONTRIBUTING.md`; releases are described in `docs/releasing.md`. The development history and
+phases are in `docs/bootstrap.md`.
 
 ## License
 

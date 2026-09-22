@@ -3,6 +3,7 @@ kotlin = "2.4.20"
 agp = "9.4.0"
 binary-compatibility-validator = "0.18.2"
 ktlint-gradle = "14.2.0"
+maven-publish = "0.37.0"
 coroutines = "1.11.0"
 serialization = "1.11.0"
 ktor = "3.6.0"
@@ -24,3 +25,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }

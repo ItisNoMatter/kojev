@@ -53,6 +53,11 @@ Jev's request and response shapes are recorded, with sources, in `docs/api-notes
 about the API is written from memory: if you need something that isn't there, look it up
 (start at `https://docs.typesafe.ai/llms.txt`), record it there first, then implement.
 
+## Releasing
+
+Maintainers only, and from CI only: see `docs/releasing.md`. A pushed `vX.Y.Z` tag uploads to
+Maven Central; the release itself is a manual step in the Central Portal.
+
 ## Deferred decisions
 
 Decisions that were consciously postponed are GitHub issues with the `deferred` label

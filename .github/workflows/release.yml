@@ -1,0 +1,49 @@
+name: Release
+
+# Publishes to Maven Central from CI when a version tag is pushed. Never from a laptop.
+# The deployment is uploaded and validated here; releasing it is a manual step in the
+# Central Portal. See docs/releasing.md.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    # macOS is required: it's the only host that can build the iOS artifacts.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Accept Android SDK licenses and install the compile platform
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
+
+      - name: Check that the tag matches the build version
+        run: |
+          expected="${GITHUB_REF_NAME#v}"
+          actual="$(./gradlew -q printVersion | tail -1)"
+          if [ "$expected" != "$actual" ]; then
+            echo "Tag is v$expected but build.gradle.kts says version = \"$actual\"." >&2
+            exit 1
+          fi
+
+      - name: Build and test every target
+        run: ./gradlew build
+
+      - name: Upload to Maven Central (released by hand in the Portal)
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: ./gradlew publishToMavenCentral
