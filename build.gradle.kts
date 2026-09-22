@@ -1,3 +1,7 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
+import com.vanniktech.maven.publish.SourcesJar
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     // Declared here (not applied) so the examples subproject can apply the same Kotlin version.
@@ -6,10 +10,11 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.binary.compatibility.validator)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.maven.publish)
 }
 
 group = "io.github.itisnomatter"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 kotlin {
     // Pinned explicitly so published bytecode targets a broadly compatible JVM regardless of
@@ -72,6 +77,45 @@ tasks.register<Test>("jvmLiveTest") {
 
 tasks.named("check") {
     dependsOn("jvmLiveTest")
+}
+
+// The release workflow compares this with the pushed tag before publishing.
+tasks.register("printVersion") {
+    doLast { println(version) }
+}
+
+mavenPublishing {
+    // Uploads and validates; the deployment is released by hand in the Central Portal.
+    publishToMavenCentral(automaticRelease = false)
+    signAllPublications()
+    coordinates(group.toString(), "kojev", version.toString())
+    configure(KotlinMultiplatform(javadocJar = JavadocJar.Empty(), sourcesJar = SourcesJar.Sources()))
+
+    pom {
+        name.set("kojev")
+        description.set("Kotlin Multiplatform client for Jev that returns your own enum/sealed types instead of string keys.")
+        inceptionYear.set("2026")
+        url.set("https://github.com/ItisNoMatter/kojev")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/license/mit")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                id.set("ItisNoMatter")
+                name.set("ItisNoMatter")
+                url.set("https://github.com/ItisNoMatter")
+            }
+        }
+        scm {
+            url.set("https://github.com/ItisNoMatter/kojev")
+            connection.set("scm:git:git://github.com/ItisNoMatter/kojev.git")
+            developerConnection.set("scm:git:ssh://git@github.com/ItisNoMatter/kojev.git")
+        }
+    }
 }
 
 apiValidation {
