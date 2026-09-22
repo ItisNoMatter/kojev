@@ -19,6 +19,11 @@ val intent: Intent = result[intentQ].value      // your enum, no string, no cast
 val angry: Double = result[angryQ]              // a probability
 ```
 
+That snippet is compiled by the build, as
+[`examples/.../snippet/ReadmeSnippet.kt`](examples/src/main/kotlin/io/github/itisnomatter/kojev/examples/snippet/ReadmeSnippet.kt)
+with the imports and the surrounding `runBlocking` a real program needs, so it cannot quietly
+stop matching the API.
+
 kojev is unofficial and not affiliated with, endorsed by, or supported by TypeSafe AI, Inc.
 "TypeSafe" and "Jev" are trademarks of TypeSafe AI, Inc.
 
