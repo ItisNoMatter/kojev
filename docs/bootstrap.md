@@ -3,6 +3,10 @@
 One-time setup and the development phases. Standing rules live in `../AGENTS.md`.
 Once every phase is complete this file has served its purpose — delete it, or keep it as history.
 
+**Status: every phase below is complete; 0.1.0 shipped to Maven Central on 2026-09-22.** Kept as
+history. What comes next is decided from the `deferred` issues (`gh issue list --label deferred`),
+not from this file; releases follow `releasing.md`.
+
 ---
 
 ## Before starting (human)
